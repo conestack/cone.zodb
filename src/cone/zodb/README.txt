@@ -9,8 +9,7 @@ Setup environment::
     >>> storage = FileStorage(os.path.join(tempdir, 'Data.fs'))
     >>> db = DB(storage)
     >>> connection = db.open()
-    >>> from cone.app.testing import security
-    >>> request = security.new_request()
+    >>> request = layer.new_request()
     >>> request.environ['repoze.zodbconn.connection'] = connection
 
 ZODBEntry::

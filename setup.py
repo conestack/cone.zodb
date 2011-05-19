@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 import sys, os
 
 version = '0.1'
-shortdesc = 'cone calendar extension'
+shortdesc = 'cone zodb integration'
 longdesc = ''
 
-setup(name='cone.calendar',
+setup(name='cone.zodb',
       version=version,
       description=shortdesc,
       long_description=longdesc,
@@ -28,5 +28,13 @@ setup(name='cone.calendar',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'cone.app',
+          'node',
+          'node.ext.zodb',
+          'pyramid',
+          'repoze.catalog',
       ],
+      extras_require = dict(test=['interlude',]),
+      tests_require=['interlude',],
+      test_suite = "cone.zodb.tests.test_suite",
       )

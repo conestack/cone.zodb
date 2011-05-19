@@ -2,11 +2,16 @@ import doctest
 import interlude
 import pprint
 import unittest2 as unittest
+from cone.app.testing import Security
+from plone.testing import layered
 
 optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.ELLIPSIS | \
               doctest.REPORT_ONLY_FIRST_FAILURE
 
+layer = Security()
+
+import uuid
 from node.ext.zodb import OOBTNode
 class DummyZODBNode(OOBTNode):
     node_info_name = 'dummytype'
@@ -23,14 +28,16 @@ TESTFILES = [
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTests([
-        doctest.DocFileSuite(
-            testfile,
-            globs={'interact': interlude.interact,
-                   'pprint': pprint.pprint,
-                   'pp': pprint.pprint,
-                   },
-            optionflags=optionflags,
-            ) for testfile in TESTFILES
+        layered(
+            doctest.DocFileSuite(
+                testfile,
+                globs={'interact': interlude.interact,
+                       'pprint': pprint.pprint,
+                       'pp': pprint.pprint,
+                       },
+                optionflags=optionflags,
+                ), layer)
+        for testfile in TESTFILES
         ])
     return suite
 

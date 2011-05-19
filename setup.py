@@ -34,7 +34,12 @@ setup(name='cone.zodb',
           'pyramid',
           'repoze.catalog',
       ],
-      extras_require = dict(test=['interlude',]),
-      tests_require=['interlude',],
+      extras_require = dict(
+          test=[
+              'interlude',
+              ]),
+      tests_require=[
+          'interlude',
+          ],
       test_suite = "cone.zodb.tests.test_suite",
       )

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import sys, os
 
 version = '0.1'
-shortdesc = 'cone zodb integration'
+shortdesc = 'cone ZODB integration'
 longdesc = ''
 
 setup(name='cone.zodb',
@@ -31,7 +31,6 @@ setup(name='cone.zodb',
           'cone.app',
           'node',
           'node.ext.zodb',
-          'pyramid',
           'repoze.catalog',
       ],
       extras_require = dict(

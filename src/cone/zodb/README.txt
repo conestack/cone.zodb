@@ -243,4 +243,3 @@ Cleanup test environment::
     >>> db.close()
     >>> import shutil
     >>> shutil.rmtree(tempdir)
-

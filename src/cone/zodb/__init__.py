@@ -83,13 +83,9 @@ def create_default_metadata(instance, node):
 
 class ZODBEntryNode(OOBTNode):
 
-    def _get_parent(self):
+    @property
+    def __parent__(self):
         return self._v_parent.parent
-
-    def _set_parent(self, val):
-        self._v_parent = val
-
-    __parent__ = property(_get_parent, _set_parent)
 
     @property
     def metadata(self):
@@ -207,4 +203,3 @@ class ZODBEntry(BaseNode):
     @locktree
     def __call__(self):
         transaction.commit()
-

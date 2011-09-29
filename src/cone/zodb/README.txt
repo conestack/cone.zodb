@@ -34,7 +34,7 @@ Context of entry is looked up by given key from db root::
 ``metadata`` and ``properties`` are returned from entry::
 
     >>> entry.context.metadata
-    <cone.app.model.BaseMetadata object at ...>
+    <cone.app.model.Metadata object at ...>
     
     >>> entry.context.properties
     <cone.app.model.ProtectedProperties object at ...>

@@ -2,14 +2,12 @@ import doctest
 import interlude
 import pprint
 import unittest2 as unittest
-from cone.app.testing import Security
+from cone.app.testing import security
 from plone.testing import layered
 
 optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.ELLIPSIS | \
               doctest.REPORT_ONLY_FIRST_FAILURE
-
-layer = Security()
 
 import uuid
 from node.ext.zodb import OOBTNode
@@ -36,7 +34,7 @@ def test_suite():
                        'pp': pprint.pprint,
                        },
                 optionflags=optionflags,
-                ), layer)
+                ), security)
         for testfile in TESTFILES
         ])
     return suite

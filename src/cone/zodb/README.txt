@@ -236,6 +236,36 @@ When deleting nodes with children, child nodes are unindexed recusriv as well::
     >>> entry.catalog.query(Eq('uid', child_uid))
     (0, IFSet([]))
 
+DB name::
+
+    >>> class CustomZODBEntry(ZODBEntry):
+    ...     @property
+    ...     def db_name(self):
+    ...         return 'custom_entry_storage'
+    ...     @property
+    ...     def name(self):
+    ...         return 'entry_storage'
+    
+    
+    >>> root['custom_entry_storage'] = CustomZODBEntry(name='custom_entry')
+    >>> entry = root['custom_entry_storage']
+    >>> entry
+    <CustomZODBEntry object 'custom_entry_storage' at ...>
+    
+    >>> entry.name
+    'entry_storage'
+    
+    >>> child = DummyZODBNode()
+    >>> entry['child'] = child
+    
+    >>> child = entry['child']
+    >>> child.path
+    ['root', 'entry_storage', 'child']
+    
+    >>> entry.db_name
+    'custom_entry_storage'
+
+
 Cleanup test environment::
 
     >>> entry()

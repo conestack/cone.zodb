@@ -1,6 +1,17 @@
 import uuid
 import datetime
 import transaction
+from plumber import plumber
+from node.parts import (
+    AsAttrAccess,
+    NodeChildValidate,
+    Nodespaces,
+    Attributes,
+    DefaultInit,
+    Nodify,
+    Lifecycle,
+    OdictStorage,
+)
 from node.locking import locktree
 from node.ext.zodb import OOBTNode
 from pyramid.threadlocal import get_current_request
@@ -9,7 +20,7 @@ from repoze.catalog.document import DocumentMap
 from repoze.catalog.query import Eq
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.path import CatalogPathIndex
-from cone.app.model import BaseNode
+from cone.app.model import AppNode
 
 
 FLOORDATETIME = datetime.datetime(1980, 1, 1) # XXX tzinfo
@@ -96,7 +107,19 @@ class ZODBEntryNode(OOBTNode):
         return self.parent.properties
 
 
-class ZODBEntry(BaseNode):
+class ZODBEntry(object):
+    __metaclass__ = plumber
+    __plumbing__ = (
+        AppNode,
+        AsAttrAccess,
+        NodeChildValidate,
+        Nodespaces,
+        Attributes,
+        DefaultInit,
+        Nodify,
+        Lifecycle,
+        OdictStorage,
+    )
 
     node_factory = ZODBEntryNode
     catalog_key = 'cone_catalog'
@@ -105,6 +128,10 @@ class ZODBEntry(BaseNode):
     create_metadata = create_default_metadata
 
     @property
+    def db_name(self):
+        return self.name
+    
+    @property
     def db_root(self):
         # XXX: get rid of get_current_request usage
         conn = get_current_request().environ['repoze.zodbconn.connection']
@@ -112,10 +139,10 @@ class ZODBEntry(BaseNode):
 
     @property
     def context(self):
-        context = self.db_root.get(self.name)
+        context = self.db_root.get(self.db_name)
         if not context:
             context = self.node_factory(name=self.name)
-            self.db_root[self.name] = context
+            self.db_root[self.db_name] = context
         context.__parent__ = self
         return context
 

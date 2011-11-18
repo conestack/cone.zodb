@@ -20,7 +20,10 @@ from repoze.catalog.document import DocumentMap
 from repoze.catalog.query import Eq
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.path import CatalogPathIndex
-from cone.app.model import AppNode
+from cone.app.model import (
+    AppNode,
+    AppRoot,
+)
 
 
 FLOORDATETIME = datetime.datetime(1980, 1, 1) # XXX tzinfo
@@ -37,6 +40,15 @@ def zodb_path(node, default=None):
     while True:
         path.append(node.name)
         if node.parent is None or isinstance(node, ZODBEntryNode):
+            return path
+        node = node.parent
+
+
+def app_path(node, default=None):
+    path = list()
+    while True:
+        path.append(node.name)
+        if node.parent is None or isinstance(node.parent, AppRoot):
             return path
         node = node.parent
 
@@ -78,6 +90,7 @@ def create_default_catalog(instance):
     catalog['type'] = CatalogFieldIndex(get_type)
     catalog['state'] = CatalogFieldIndex(get_state)
     catalog['path'] = CatalogPathIndex(zodb_path)
+    catalog['app_path'] = CatalogPathIndex(app_path)
     catalog['title'] = CatalogFieldIndex(get_title)
     return catalog
 
@@ -85,6 +98,7 @@ def create_default_catalog(instance):
 def create_default_metadata(instance, node):
     metadata = dict()
     metadata['path'] = zodb_path(node)
+    metadata['app_path'] = app_path(node)
     metadata['title'] = node.attrs['title']
     metadata['combined_title'] = combined_title(node)
     if hasattr(node, 'state'):

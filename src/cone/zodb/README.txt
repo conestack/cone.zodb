@@ -159,11 +159,12 @@ Catalog for this ZODBEntry::
 
     >>> from repoze.catalog.query import Eq
     >>> entry.catalog
-    {'path': <repoze.catalog.indexes.path.CatalogPathIndex object at ...>, 
-    'state': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
-    'type': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
+    {'app_path': <repoze.catalog.indexes.path.CatalogPathIndex object at ...>, 
     'uid': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
-    'title': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>}
+    'title': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
+    'state': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
+    'path': <repoze.catalog.indexes.path.CatalogPathIndex object at ...>, 
+    'type': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>}
 
 Empty. Nothing indexed yet::
 
@@ -179,7 +180,8 @@ Index node and query catalog::
     (1, IFSet([...]))
     
     >>> [(k, v) for k, v in entry.doc_metadata(uid).items()]
-    [('combined_title', 'myentry - foo'), 
+    [('app_path', ['foo', 'myentry', 'root']), 
+    ('combined_title', 'myentry - foo'), 
     ('path', ['foo', 'myentry']), 
     ('state', 'state_1'), 
     ('title', 'foo')]
@@ -189,7 +191,8 @@ After changing the node, reindex::
     >>> foo.attrs['title'] = 'foo changed'
     >>> entry.index_doc(foo)
     >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
-    [('combined_title', 'myentry - foo changed'), 
+    [('app_path', ['foo', 'myentry', 'root']), 
+    ('combined_title', 'myentry - foo changed'), 
     ('path', ['foo', 'myentry']), 
     ('state', 'state_1'), 
     ('title', 'foo changed')]

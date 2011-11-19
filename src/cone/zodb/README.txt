@@ -98,7 +98,16 @@ Entry and context same tree::
     
     >>> from cone.zodb import zodb_path
     >>> zodb_path(bar)
-    ['bar', 'myentry']
+    ['myentry', 'bar']
+    
+    >>> zodb_path(foo)
+    ['myentry', 'foo']
+
+``app_path``::
+
+    >>> from cone.zodb import app_path
+    >>> app_path(foo)
+    ['root', 'myentry', 'foo']
 
 ``combined_title``::
 
@@ -180,9 +189,9 @@ Index node and query catalog::
     (1, IFSet([...]))
     
     >>> [(k, v) for k, v in entry.doc_metadata(uid).items()]
-    [('app_path', ['foo', 'myentry', 'root']), 
+    [('app_path', ['root', 'myentry', 'foo']), 
     ('combined_title', 'myentry - foo'), 
-    ('path', ['foo', 'myentry']), 
+    ('path', ['myentry', 'foo']), 
     ('state', 'state_1'), 
     ('title', 'foo')]
 
@@ -191,9 +200,9 @@ After changing the node, reindex::
     >>> foo.attrs['title'] = 'foo changed'
     >>> entry.index_doc(foo)
     >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
-    [('app_path', ['foo', 'myentry', 'root']), 
+    [('app_path', ['root', 'myentry', 'foo']), 
     ('combined_title', 'myentry - foo changed'), 
-    ('path', ['foo', 'myentry']), 
+    ('path', ['myentry', 'foo']), 
     ('state', 'state_1'), 
     ('title', 'foo changed')]
 

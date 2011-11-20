@@ -1,7 +1,10 @@
 import uuid
 import datetime
 import transaction
-from plumber import plumber
+from plumber import (
+    plumber,
+    default,
+)
 from node.parts import (
     AsAttrAccess,
     NodeChildValidate,
@@ -13,7 +16,11 @@ from node.parts import (
     OdictStorage,
 )
 from node.locking import locktree
-from node.ext.zodb import OOBTNode
+from node.utils import instance_property
+from node.ext.zodb import (
+    OOBTNode,
+    OOBTNodeAttributes,
+)
 from pyramid.threadlocal import get_current_request
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.document import DocumentMap
@@ -23,6 +30,10 @@ from repoze.catalog.indexes.path import CatalogPathIndex
 from cone.app.model import (
     AppNode,
     AppRoot,
+)
+from cone.app.security import (
+    DEFAULT_ACL,
+    PrincipalACL,
 )
 
 
@@ -246,3 +257,13 @@ class ZODBEntry(object):
     @locktree
     def __call__(self):
         transaction.commit()
+
+
+class ZODBPrincipalACL(PrincipalACL):
+    """Principal ACL for ZODB nodes.
+    """
+    
+    @default
+    @instance_property
+    def principal_roles(self):
+        return OOBTNodeAttributes('principal_roles')

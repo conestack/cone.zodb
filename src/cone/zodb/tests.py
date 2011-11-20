@@ -20,7 +20,7 @@ class DummyZODBNode(OOBTNode):
         self.state = 'state_1'
 
 TESTFILES = [
-    'README.txt',
+    'README.rst',
 ]
 
 def test_suite():

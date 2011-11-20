@@ -277,6 +277,36 @@ DB name::
     >>> entry.db_name
     'custom_entry_storage'
 
+ZODBPrincipalACL::
+
+    >>> from plumber import plumber, default
+    >>> from node.ext.zodb import ZODBNode
+    >>> from cone.app.model import AppNode
+    >>> from cone.app.security import DEFAULT_ACL
+    >>> from cone.zodb import ZODBPrincipalACL
+    
+    >>> class ZODBPrincipalACLNode(ZODBNode):
+    ...     __metaclass__ = plumber
+    ...     __plumbing__ = AppNode, ZODBPrincipalACL
+    ...     @property
+    ...     def __acl__(self):
+    ...         return DEFAULT_ACL
+    
+    >>> node = ZODBPrincipalACLNode()
+    >>> node.principal_roles
+    <OOBTNodeAttributes object 'principal_roles' at ...>
+    
+    >>> node.principal_roles['someuser'] = ['manager']
+    >>> node.__acl__
+    [('Allow', 'someuser', ['edit', 'add', 'delete', 'manage', 'view']), 
+    ('Allow', 'system.Authenticated', ['view']), 
+    ('Allow', 'role:viewer', ['view']), 
+    ('Allow', 'role:editor', ['view', 'add', 'edit']), 
+    ('Allow', 'role:admin', ['view', 'add', 'edit', 'delete']), 
+    ('Allow', 'role:owner', ['view', 'add', 'edit', 'delete']), 
+    ('Allow', 'role:manager', ['view', 'add', 'edit', 'delete', 'manage']), 
+    ('Allow', 'system.Everyone', ['login']), 
+    ('Deny', 'system.Everyone', <pyramid.security.AllPermissionsList object at ...>)]
 
 Cleanup test environment::
 

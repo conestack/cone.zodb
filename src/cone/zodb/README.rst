@@ -290,6 +290,10 @@ Reindexing happens at ``__call__`` time::
     ('state', 'state_1'), 
     ('title', 'foo changed')]
 
+Calling the ZODB entry delegates to refering ZODB entry node::
+
+    >>> entry()
+
 Create child for 'bar'::
 
     >>> child = CatalogAwareDummyNode()

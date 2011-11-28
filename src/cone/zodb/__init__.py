@@ -23,7 +23,10 @@ from node.ext.zodb import (
     OOBTNode,
     OOBTNodeAttributes,
 )
-from zope.interface import implements
+from zope.interface import (
+    Interface,
+    implements,
+)
 from pyramid.threadlocal import get_current_request
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.document import DocumentMap
@@ -40,92 +43,8 @@ from cone.app.security import (
 )
 
 
-class IZODBEntryNode(IZODBNode):
-    """Marker interface for first level ZODB nodes.
-    """
-
-
-class ZODBEntryNode(OOBTNode):
-    implements(IZODBEntryNode)
-
-    @property
-    def __parent__(self):
-        return self._v_parent.parent
-
-    @property
-    def metadata(self):
-        return self.parent.metadata
-
-    @property
-    def properties(self):
-        return self.parent.properties
-
-
-class ZODBEntry(object):
-    __metaclass__ = plumber
-    __plumbing__ = (
-        AppNode,
-        AsAttrAccess,
-        NodeChildValidate,
-        Nodespaces,
-        Attributes,
-        DefaultInit,
-        Nodify,
-        Lifecycle,
-        OdictStorage,
-    )
-
-    node_factory = ZODBEntryNode
-
-    @property
-    def db_name(self):
-        return self.name
-    
-    @property
-    def db_root(self):
-        # XXX: get rid of get_current_request usage
-        conn = get_current_request().environ['repoze.zodbconn.connection']
-        return conn.root()
-
-    @property
-    def context(self):
-        context = self.db_root.get(self.db_name)
-        if not context:
-            context = self.node_factory(name=self.name)
-            self.db_root[self.db_name] = context
-        context.__parent__ = self
-        return context
-
-    def __getitem__(self, key):
-        return self.context[key]
-
-    @locktree
-    def __setitem__(self, key, val):
-        self.context[key] = val
-
-    @locktree
-    def __delitem__(self, key):
-        del self.context[key]
-    
-    def __iter__(self):
-        return self.context.__iter__()
-
-    @locktree
-    def __call__(self):
-        self.context()
-
-
-class ZODBPrincipalACL(PrincipalACL):
-    """Principal ACL for ZODB nodes.
-    """
-    
-    @default
-    @instance_property
-    def principal_roles(self):
-        return OOBTNodeAttributes('principal_roles')
-
-
 FLOORDATETIME = datetime.datetime(1980, 1, 1) # XXX tzinfo
+
 
 def force_dt(value):
     if not isinstance(value, datetime.datetime):
@@ -215,9 +134,100 @@ def zodb_entry_for(node):
         node = node.parent
 
 
+class IZODBEntryNode(IZODBNode):
+    """Marker interface for first level ZODB nodes.
+    """
+
+
+class ZODBEntryNode(OOBTNode):
+    implements(IZODBEntryNode)
+
+    @property
+    def __parent__(self):
+        return self._v_parent.parent
+
+    @property
+    def metadata(self):
+        return self.parent.metadata
+
+    @property
+    def properties(self):
+        return self.parent.properties
+
+
+class ZODBEntry(object):
+    __metaclass__ = plumber
+    __plumbing__ = (
+        AppNode,
+        AsAttrAccess,
+        NodeChildValidate,
+        Nodespaces,
+        Attributes,
+        DefaultInit,
+        Nodify,
+        Lifecycle,
+        OdictStorage,
+    )
+
+    node_factory = ZODBEntryNode
+
+    @property
+    def db_name(self):
+        return self.name
+    
+    @property
+    def db_root(self):
+        # XXX: get rid of get_current_request usage
+        conn = get_current_request().environ['repoze.zodbconn.connection']
+        return conn.root()
+
+    @property
+    def context(self):
+        context = self.db_root.get(self.db_name)
+        if not context:
+            context = self.node_factory(name=self.name)
+            self.db_root[self.db_name] = context
+        context.__parent__ = self
+        return context
+
+    def __getitem__(self, key):
+        return self.context[key]
+
+    @locktree
+    def __setitem__(self, key, val):
+        self.context[key] = val
+
+    @locktree
+    def __delitem__(self, key):
+        del self.context[key]
+    
+    def __iter__(self):
+        return self.context.__iter__()
+
+    @locktree
+    def __call__(self):
+        self.context()
+
+
+class ZODBPrincipalACL(PrincipalACL):
+    """Principal ACL for ZODB nodes.
+    """
+    
+    @default
+    @instance_property
+    def principal_roles(self):
+        return OOBTNodeAttributes('principal_roles')
+
+
+class ICatalogAware(Interface):
+    """Marker interface if ZODB node is catalog aware.
+    """
+
+
 class CatalogAware(Part):
     """Plumbing part for nodes indexed in a catalog.
     """
+    implements(ICatalogAware)
     
     @plumb
     def __setitem__(_next, self, key, value):
@@ -298,9 +308,10 @@ class CatalogAwareZODBEntry(ZODBEntry):
         catalog.index_doc(docid, node)
     
     def index_recursiv(self, node):
-        self.index_doc(node)
-        if hasattr(self, '_index_count'):
-            self._index_count += 1
+        if ICatalogAware.providedBy(node):
+            self.index_doc(node)
+            if hasattr(self, '_index_count'):
+                self._index_count += 1
         for child in node.values():
             self.index_recursiv(child)
 
@@ -312,6 +323,7 @@ class CatalogAwareZODBEntry(ZODBEntry):
         doc_map.remove_address(uid)
 
     def unindex_recursiv(self, node):
-        self.unindex_doc(node)
+        if ICatalogAware.providedBy(node):
+            self.unindex_doc(node)
         for child in node.values():
             self.unindex_recursiv(child)

@@ -12,14 +12,11 @@ Setup environment::
     >>> request = layer.new_request()
     >>> request.environ['repoze.zodbconn.connection'] = connection
 
-ZODBEntry::
+Create node containing ZODBEntry::
 
     >>> import uuid
     >>> from cone.app.model import BaseNode
     >>> from cone.zodb import ZODBEntry
-
-Create node containing ZODBEntry::
-
     >>> root = BaseNode(name='root')
     >>> root['myentry'] = ZODBEntry()
     >>> entry = root['myentry']
@@ -63,13 +60,13 @@ Create children::
     >>> foo.attrs.keys()
     ['uid', 'title']
 
-Its a good idea to always store a UID for each ZODB node. Catalog aware ZODB
-entries require this::
+It's a good idea to always store a UID for each ZODB node. For catalog aware
+ZODB nodes this is required::
 
     >>> foo.attrs['uid']
     UUID('...')
 
-Entry and context same tree::
+Entry and entry node result in the same tree::
 
     >>> entry.printtree()
     <class 'cone.zodb.ZODBEntry'>: myentry
@@ -264,7 +261,15 @@ Add nodes and query catalog::
     ('state', 'state_1'), 
     ('title', 'foo')]
 
-After changing the node, reindex happens at ``__call__`` time::
+``zodb_entry_for``::
+
+    >>> from cone.zodb import zodb_entry_for
+    >>> zodb_entry_for(root)
+    
+    >>> zodb_entry_for(bar)
+    <CatalogAwareZODBEntry object 'catalog_aware' at ...>
+
+Reindexing happens at ``__call__`` time::
 
     >>> foo.attrs['title'] = 'foo changed'
     >>> foo()
@@ -281,6 +286,11 @@ Create child for 'bar'::
     >>> bar['child'] = child
     >>> child.attrs['title'] = 'Child of bar'
     >>> child()
+    >>> entry.printtree()
+    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: bar
+        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: child
     
     >>> bar_uid = bar.attrs['uid']
     >>> child_uid = child.attrs['uid']
@@ -291,12 +301,6 @@ Create child for 'bar'::
     (1, IFSet([...]))
 
 Rebuild catalog::
-
-    >>> entry.printtree()
-    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: bar
-        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: child
 
     >>> entry.rebuild_catalog()
     3
@@ -316,10 +320,50 @@ Delete node. Gets unindexed recursive.::
     
     >>> entry.catalog.query(Eq('uid', child_uid))
     (0, IFSet([]))
+    
+Test moving of subtrees, if objects get indexed the right way::
 
-Calling a catalog aware node reindexes it::
+    >>> source = entry['source'] = CatalogAwareDummyNode()
+    >>> source['c1'] = CatalogAwareDummyNode()
+    >>> source['c2'] = CatalogAwareDummyNode()
+    >>> target = entry['target'] = CatalogAwareDummyNode()
+    >>> entry.printtree()
+    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: source
+        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c1
+        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c2
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: target
+    
+    >>> uid = source['c1'].attrs['uid']
+    >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
+    [('app_path', ['root', 'catalog_aware', 'source', 'c1']), 
+    ('combined_title', 'catalog_aware - foo - foo'), 
+    ('path', ['catalog_aware', 'source', 'c1']), 
+    ('state', 'state_1'), 
+    ('title', 'foo')]
+    
+    >>> to_move = entry.detach('source')
+    >>> target[to_move.name] = to_move
+    >>> uid = target['source']['c1'].attrs['uid']
+    >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
+    [('app_path', ['root', 'catalog_aware', 'target', 'source', 'c1']), 
+    ('combined_title', 'catalog_aware - foo - foo - foo'), 
+    ('path', ['catalog_aware', 'target', 'source', 'c1']), 
+    ('state', 'state_1'), 
+    ('title', 'foo')]
+    
+    >>> entry.printtree()
+    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: target
+        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: source
+          <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c1
+          <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c2
 
-    >>> entry()
+XXX: check how path index works correctly::
+
+    >> entry.catalog.query(Eq('app_path', 'root/catalog_aware/source/c1'))
 
 Cleanup test environment::
 

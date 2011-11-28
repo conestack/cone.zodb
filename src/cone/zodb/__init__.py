@@ -58,7 +58,7 @@ def zodb_path(node, default=None):
         path.append(node.name)
         if node.parent is None or isinstance(node, ZODBEntryNode):
             path.reverse()
-            return path
+            return '/%s' % '/'.join(path)
         node = node.parent
 
 
@@ -68,7 +68,7 @@ def app_path(node, default=None):
         path.append(node.name)
         if node.parent is None or isinstance(node.parent, AppRoot):
             path.reverse()
-            return path
+            return '/%s' % '/'.join(path)
         node = node.parent
 
 

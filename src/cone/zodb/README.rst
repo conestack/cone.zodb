@@ -156,16 +156,16 @@ Helper functions for catalog indexing::
     
     >>> from cone.zodb import zodb_path
     >>> zodb_path(bar)
-    ['myentry', 'bar']
+    '/myentry/bar'
     
     >>> zodb_path(foo)
-    ['myentry', 'foo']
+    '/myentry/foo'
 
 ``app_path``::
 
     >>> from cone.zodb import app_path
     >>> app_path(foo)
-    ['root', 'myentry', 'foo']
+    '/root/myentry/foo'
 
 ``combined_title``::
 
@@ -253,11 +253,21 @@ Add nodes and query catalog::
     >>> res = entry.catalog.query(Eq('uid', uid))
     >>> res
     (1, IFSet([...]))
+
+Check path index::
+
+    >>> entry.catalog.query(Eq('path', {'query': '/catalog_aware', 'level': 0}))
+    (2, IFSet([..., ...]))
     
+    >>> entry.catalog.query(Eq('app_path', {'query': 'root'}))
+    (2, IFSet([..., ...]))
+
+Check metadata::
+
     >>> [(k, v) for k, v in entry.doc_metadata(uid).items()]
-    [('app_path', ['root', 'catalog_aware', 'foo']), 
+    [('app_path', '/root/catalog_aware/foo'), 
     ('combined_title', 'catalog_aware - foo'), 
-    ('path', ['catalog_aware', 'foo']), 
+    ('path', '/catalog_aware/foo'), 
     ('state', 'state_1'), 
     ('title', 'foo')]
 
@@ -274,9 +284,9 @@ Reindexing happens at ``__call__`` time::
     >>> foo.attrs['title'] = 'foo changed'
     >>> foo()
     >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
-    [('app_path', ['root', 'catalog_aware', 'foo']), 
+    [('app_path', '/root/catalog_aware/foo'), 
     ('combined_title', 'catalog_aware - foo changed'), 
-    ('path', ['catalog_aware', 'foo']), 
+    ('path', '/catalog_aware/foo'), 
     ('state', 'state_1'), 
     ('title', 'foo changed')]
 
@@ -337,9 +347,9 @@ Test moving of subtrees, if objects get indexed the right way::
     
     >>> uid = source['c1'].attrs['uid']
     >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
-    [('app_path', ['root', 'catalog_aware', 'source', 'c1']), 
+    [('app_path', '/root/catalog_aware/source/c1'), 
     ('combined_title', 'catalog_aware - foo - foo'), 
-    ('path', ['catalog_aware', 'source', 'c1']), 
+    ('path', '/catalog_aware/source/c1'), 
     ('state', 'state_1'), 
     ('title', 'foo')]
     
@@ -347,9 +357,9 @@ Test moving of subtrees, if objects get indexed the right way::
     >>> target[to_move.name] = to_move
     >>> uid = target['source']['c1'].attrs['uid']
     >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
-    [('app_path', ['root', 'catalog_aware', 'target', 'source', 'c1']), 
+    [('app_path', '/root/catalog_aware/target/source/c1'), 
     ('combined_title', 'catalog_aware - foo - foo - foo'), 
-    ('path', ['catalog_aware', 'target', 'source', 'c1']), 
+    ('path', '/catalog_aware/target/source/c1'), 
     ('state', 'state_1'), 
     ('title', 'foo')]
     
@@ -360,10 +370,13 @@ Test moving of subtrees, if objects get indexed the right way::
         <class 'cone.zodb.tests.CatalogAwareDummyNode'>: source
           <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c1
           <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c2
-
-XXX: check how path index works correctly::
-
-    >> entry.catalog.query(Eq('app_path', 'root/catalog_aware/source/c1'))
+    
+    >>> entry.catalog.query(Eq('path', {'query': '/catalog_aware/target'}))
+    (4, IFSet([..., ..., ..., ...]))
+    
+    >>> entry.catalog.query(Eq('path',
+    ...                        {'query': '/catalog_aware/target/source'}))
+    (3, IFSet([..., ..., ...]))
 
 Cleanup test environment::
 

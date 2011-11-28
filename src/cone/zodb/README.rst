@@ -63,8 +63,8 @@ Create children::
     >>> foo.attrs.keys()
     ['uid', 'title']
 
-Its a good idea to always store a UID for each ZODB node. Also considered in
-catalog::
+Its a good idea to always store a UID for each ZODB node. Catalog aware ZODB
+entries require this::
 
     >>> foo.attrs['uid']
     UUID('...')
@@ -88,6 +88,67 @@ Entry and context same tree::
     
     >>> foo.__parent__.__parent__
     <BaseNode object 'root' at ...>
+
+DB name::
+
+    >>> class CustomZODBEntry(ZODBEntry):
+    ...     @property
+    ...     def db_name(self):
+    ...         return 'custom_entry_storage'
+    ...     @property
+    ...     def name(self):
+    ...         return 'entry_storage'
+    
+    >>> root['custom_entry_storage'] = CustomZODBEntry(name='custom_entry')
+    >>> entry = root['custom_entry_storage']
+    >>> entry
+    <CustomZODBEntry object 'custom_entry_storage' at ...>
+    
+    >>> entry.name
+    'entry_storage'
+    
+    >>> child = DummyZODBNode()
+    >>> entry['child'] = child
+    
+    >>> child = entry['child']
+    >>> child.path
+    ['root', 'entry_storage', 'child']
+    
+    >>> entry.db_name
+    'custom_entry_storage'
+
+ZODBPrincipalACL::
+
+    >>> from plumber import plumber, default
+    >>> from node.ext.zodb import ZODBNode
+    >>> from cone.app.model import AppNode
+    >>> from cone.app.security import DEFAULT_ACL
+    >>> from cone.zodb import ZODBPrincipalACL
+    
+    >>> class ZODBPrincipalACLNode(ZODBNode):
+    ...     __metaclass__ = plumber
+    ...     __plumbing__ = AppNode, ZODBPrincipalACL
+    ...     @property
+    ...     def __acl__(self):
+    ...         return DEFAULT_ACL
+    
+    >>> node = ZODBPrincipalACLNode()
+    >>> node.principal_roles
+    <OOBTNodeAttributes object 'principal_roles' at ...>
+    
+    >>> node.principal_roles['someuser'] = ['manager']
+    >>> node.__acl__
+    [('Allow', 'someuser', ['edit', 'manage', 'add', 'view', 'manage_permissions', 'delete']), 
+    ('Allow', 'system.Authenticated', ['view']), 
+    ('Allow', 'role:viewer', ['view']), 
+    ('Allow', 'role:editor', ['view', 'add', 'edit']), 
+    ('Allow', 'role:admin', ['view', 'add', 'edit', 'delete', 'manage_permissions']), 
+    ('Allow', 'role:owner', ['view', 'add', 'edit', 'delete', 'manage_permissions']), 
+    ('Allow', 'role:manager', ['view', 'add', 'edit', 'delete', 'manage_permissions', 'manage']), 
+    ('Allow', 'system.Everyone', ['login']), 
+    ('Deny', 'system.Everyone', <pyramid.security.AllPermissionsList object at ...>)]
+
+Helper functions for catalog indexing::
 
 ``path``::
 
@@ -164,9 +225,11 @@ Entry and context same tree::
     >>> get_title(foo, 'default')
     'foo'
 
-Catalog for this ZODBEntry::
+Create calatog aware ZODB entry::
 
-    >>> from repoze.catalog.query import Eq
+    >>> from cone.zodb.tests import CatalogAwareDummyNode
+    >>> from cone.zodb import CatalogAwareZODBEntry
+    >>> entry = root['catalog_aware'] = CatalogAwareZODBEntry()
     >>> entry.catalog
     {'app_path': <repoze.catalog.indexes.path.CatalogPathIndex object at ...>, 
     'uid': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
@@ -174,45 +237,51 @@ Catalog for this ZODBEntry::
     'state': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
     'path': <repoze.catalog.indexes.path.CatalogPathIndex object at ...>, 
     'type': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>}
+    
+    >>> foo = CatalogAwareDummyNode()
+    >>> bar = CatalogAwareDummyNode()
+    >>> bar.attrs['title'] = 'bar'
 
-Empty. Nothing indexed yet::
+Empty. Nodes not added yet::
 
     >>> uid = foo.attrs['uid']
+    >>> from repoze.catalog.query import Eq
     >>> entry.catalog.query(Eq('uid', uid))
     (0, IFSet([]))
 
-Index node and query catalog::
+Add nodes and query catalog::
 
-    >>> entry.index_doc(foo)
+    >>> entry['foo'] = foo
+    >>> entry['bar'] = bar
     >>> res = entry.catalog.query(Eq('uid', uid))
     >>> res
     (1, IFSet([...]))
     
     >>> [(k, v) for k, v in entry.doc_metadata(uid).items()]
-    [('app_path', ['root', 'myentry', 'foo']), 
-    ('combined_title', 'myentry - foo'), 
-    ('path', ['myentry', 'foo']), 
+    [('app_path', ['root', 'catalog_aware', 'foo']), 
+    ('combined_title', 'catalog_aware - foo'), 
+    ('path', ['catalog_aware', 'foo']), 
     ('state', 'state_1'), 
     ('title', 'foo')]
 
-After changing the node, reindex::
+After changing the node, reindex happens at ``__call__`` time::
 
     >>> foo.attrs['title'] = 'foo changed'
-    >>> entry.index_doc(foo)
+    >>> foo()
     >>> [(k, v) for k, v in entry.doc_metadata(str(uid)).items()]
-    [('app_path', ['root', 'myentry', 'foo']), 
-    ('combined_title', 'myentry - foo changed'), 
-    ('path', ['myentry', 'foo']), 
+    [('app_path', ['root', 'catalog_aware', 'foo']), 
+    ('combined_title', 'catalog_aware - foo changed'), 
+    ('path', ['catalog_aware', 'foo']), 
     ('state', 'state_1'), 
     ('title', 'foo changed')]
 
 Create child for 'bar'::
 
-    >>> child = DummyZODBNode()
+    >>> child = CatalogAwareDummyNode()
     >>> bar['child'] = child
     >>> child.attrs['title'] = 'Child of bar'
-    >>> entry.index_doc(bar)
-    >>> entry.index_doc(child)
+    >>> child()
+    
     >>> bar_uid = bar.attrs['uid']
     >>> child_uid = child.attrs['uid']
     >>> entry.catalog.query(Eq('uid', bar_uid))
@@ -223,24 +292,24 @@ Create child for 'bar'::
 
 Rebuild catalog::
 
+    >>> entry.printtree()
+    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: bar
+        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: child
+
     >>> entry.rebuild_catalog()
     3
     
     >>> entry.catalog.query(Eq('type', 'dummytype'))
     (3, IFSet([..., ..., ...]))
 
-Unindex node::
-
-    >>> entry.unindex_doc(foo)
-    >>> entry.catalog.query(Eq('uid', foo.attrs['uid']))
-    (0, IFSet([]))
-
-When deleting nodes with children, child nodes are unindexed recusriv as well::
+Delete node. Gets unindexed recursive.::
 
     >>> del entry['bar']
     >>> entry.printtree()
-    <class 'cone.zodb.ZODBEntry'>: myentry
-      <class 'cone.zodb.tests.DummyZODBNode'>: foo
+    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
     
     >>> entry.catalog.query(Eq('uid', bar_uid))
     (0, IFSet([]))
@@ -248,69 +317,14 @@ When deleting nodes with children, child nodes are unindexed recusriv as well::
     >>> entry.catalog.query(Eq('uid', child_uid))
     (0, IFSet([]))
 
-DB name::
+Calling a catalog aware node reindexes it::
 
-    >>> class CustomZODBEntry(ZODBEntry):
-    ...     @property
-    ...     def db_name(self):
-    ...         return 'custom_entry_storage'
-    ...     @property
-    ...     def name(self):
-    ...         return 'entry_storage'
-    
-    
-    >>> root['custom_entry_storage'] = CustomZODBEntry(name='custom_entry')
-    >>> entry = root['custom_entry_storage']
-    >>> entry
-    <CustomZODBEntry object 'custom_entry_storage' at ...>
-    
-    >>> entry.name
-    'entry_storage'
-    
-    >>> child = DummyZODBNode()
-    >>> entry['child'] = child
-    
-    >>> child = entry['child']
-    >>> child.path
-    ['root', 'entry_storage', 'child']
-    
-    >>> entry.db_name
-    'custom_entry_storage'
-
-ZODBPrincipalACL::
-
-    >>> from plumber import plumber, default
-    >>> from node.ext.zodb import ZODBNode
-    >>> from cone.app.model import AppNode
-    >>> from cone.app.security import DEFAULT_ACL
-    >>> from cone.zodb import ZODBPrincipalACL
-    
-    >>> class ZODBPrincipalACLNode(ZODBNode):
-    ...     __metaclass__ = plumber
-    ...     __plumbing__ = AppNode, ZODBPrincipalACL
-    ...     @property
-    ...     def __acl__(self):
-    ...         return DEFAULT_ACL
-    
-    >>> node = ZODBPrincipalACLNode()
-    >>> node.principal_roles
-    <OOBTNodeAttributes object 'principal_roles' at ...>
-    
-    >>> node.principal_roles['someuser'] = ['manager']
-    >>> node.__acl__
-    [('Allow', 'someuser', ['edit', 'manage', 'add', 'view', 'manage_permissions', 'delete']), 
-    ('Allow', 'system.Authenticated', ['view']), 
-    ('Allow', 'role:viewer', ['view']), 
-    ('Allow', 'role:editor', ['view', 'add', 'edit']), 
-    ('Allow', 'role:admin', ['view', 'add', 'edit', 'delete', 'manage_permissions']), 
-    ('Allow', 'role:owner', ['view', 'add', 'edit', 'delete', 'manage_permissions']), 
-    ('Allow', 'role:manager', ['view', 'add', 'edit', 'delete', 'manage_permissions', 'manage']), 
-    ('Allow', 'system.Everyone', ['login']), 
-    ('Deny', 'system.Everyone', <pyramid.security.AllPermissionsList object at ...>)]
+    >>> entry()
 
 Cleanup test environment::
 
-    >>> entry()
+    >>> import transaction
+    >>> transaction.commit()
     >>> connection.close()
     >>> db.close()
     >>> import shutil

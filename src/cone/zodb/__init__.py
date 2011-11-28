@@ -58,8 +58,14 @@ def zodb_path(node, default=None):
         path.append(node.name)
         if node.parent is None or isinstance(node, ZODBEntryNode):
             path.reverse()
-            return '/%s' % '/'.join(path)
+            return path
         node = node.parent
+
+
+def str_zodb_path(node, default=None):
+    path = zodb_path(node, default)
+    if path:
+        return '/%s' % '/'.join(path)
 
 
 def app_path(node, default=None):
@@ -68,8 +74,14 @@ def app_path(node, default=None):
         path.append(node.name)
         if node.parent is None or isinstance(node.parent, AppRoot):
             path.reverse()
-            return '/%s' % '/'.join(path)
+            return path
         node = node.parent
+
+
+def str_app_path(node, default=None):
+    path = app_path(node, default)
+    if path:
+        return '/%s' % '/'.join(path)
 
 
 def get_uid(node, default):
@@ -108,8 +120,8 @@ def create_default_catalog(instance):
     catalog['uid'] = CatalogFieldIndex(get_uid)
     catalog['type'] = CatalogFieldIndex(get_type)
     catalog['state'] = CatalogFieldIndex(get_state)
-    catalog['path'] = CatalogPathIndex(zodb_path)
-    catalog['app_path'] = CatalogPathIndex(app_path)
+    catalog['path'] = CatalogPathIndex(str_zodb_path)
+    catalog['app_path'] = CatalogPathIndex(str_app_path)
     catalog['title'] = CatalogFieldIndex(get_title)
     return catalog
 

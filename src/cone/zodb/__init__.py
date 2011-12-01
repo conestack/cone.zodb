@@ -231,6 +231,14 @@ class ZODBPrincipalACL(PrincipalACL):
         return OOBTNodeAttributes('principal_roles')
 
 
+class ZODBEntryPrincipalACL(PrincipalACL):
+    
+    @default
+    @instance_property
+    def principal_roles(self):
+        return self.context.principal_roles
+
+
 class ICatalogAware(Interface):
     """Marker interface if ZODB node is catalog aware.
     """

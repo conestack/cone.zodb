@@ -34,7 +34,7 @@ Context of entry is looked up by given key from db root::
     <cone.app.model.Metadata object at ...>
     
     >>> entry.context.properties
-    <cone.app.model.ProtectedProperties object at ...>
+    <cone.app.model.Properties object at ...>
 
 Create children::
 
@@ -135,13 +135,17 @@ ZODBPrincipalACL::
     
     >>> node.principal_roles['someuser'] = ['manager']
     >>> node.__acl__
-    [('Allow', 'someuser', ['edit', 'manage', 'add', 'view', 'manage_permissions', 'delete']), 
+    [('Allow', 'someuser', ['cut', 'edit', 'view', 'add', 'change_state', 
+    'manage', 'copy', 'paste', 'manage_permissions', 'delete']), 
     ('Allow', 'system.Authenticated', ['view']), 
     ('Allow', 'role:viewer', ['view']), 
     ('Allow', 'role:editor', ['view', 'add', 'edit']), 
-    ('Allow', 'role:admin', ['view', 'add', 'edit', 'delete', 'manage_permissions']), 
-    ('Allow', 'role:owner', ['view', 'add', 'edit', 'delete', 'manage_permissions']), 
-    ('Allow', 'role:manager', ['view', 'add', 'edit', 'delete', 'manage_permissions', 'manage']), 
+    ('Allow', 'role:admin', ['view', 'add', 'edit', 'delete', 'cut', 'copy', 
+    'paste', 'manage_permissions', 'change_state']), 
+    ('Allow', 'role:owner', ['view', 'add', 'edit', 'delete', 'cut', 'copy', 
+    'paste', 'manage_permissions', 'change_state']), 
+    ('Allow', 'role:manager', ['view', 'add', 'edit', 'delete', 'cut', 'copy', 
+    'paste', 'manage_permissions', 'change_state', 'manage']), 
     ('Allow', 'system.Everyone', ['login']), 
     ('Deny', 'system.Everyone', <pyramid.security.AllPermissionsList object at ...>)]
 

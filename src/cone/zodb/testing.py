@@ -1,14 +1,28 @@
 import os
 import tempfile
 import shutil
-from plumber import plumber
+from plumber import (
+    plumber,
+    default,
+)
 from ZODB.FileStorage import FileStorage
 from ZODB.DB import DB
 from node.parts import UUIDAware
-from node.ext.zodb import OOBTNode
+from node.ext.zodb import (
+    ZODBNode,
+    OOBTNode,
+)
 from cone.app import root
 from cone.app.testing import Security
-from cone.zodb import CatalogAware
+from cone.app.model import AppNode
+from cone.app.security import DEFAULT_ACL
+from cone.zodb import (
+    ZODBEntry,
+    ZODBEntryNode,
+    ZODBPrincipalACL,
+    ZODBEntryPrincipalACL,
+    CatalogAware,
+)
 
 
 class ZODBDummyNode(OOBTNode):
@@ -26,6 +40,35 @@ class ZODBDummyNode(OOBTNode):
 class CatalogAwareZODBDummyNode(ZODBDummyNode):
     __metaclass__ = plumber
     __plumbing__ = CatalogAware
+
+
+class ZODBPrincipalACLNode(ZODBNode):
+    __metaclass__ = plumber
+    __plumbing__ = AppNode, ZODBPrincipalACL
+    
+    @property
+    def __acl__(self):
+        return DEFAULT_ACL
+
+    
+class ZODBPrincipalACLEntryNode(ZODBEntryNode):
+    __metaclass__ = plumber
+    __plumbing__ = ZODBPrincipalACL
+    
+    @property
+    def __acl__(self):
+        return DEFAULT_ACL
+   
+    
+class ZODBPrincipalACLEntry(ZODBEntry):
+    __metaclass__ = plumber
+    __plumbing__ = ZODBEntryPrincipalACL
+    
+    node_factory = ZODBPrincipalACLEntryNode
+    
+    @property
+    def __acl__(self):
+        return DEFAULT_ACL
 
 
 class ZODBLayer(Security):

@@ -20,4 +20,4 @@ class ZODBEntryPrincipalACL(PrincipalACL):
     @default
     @instance_property
     def principal_roles(self):
-        return self.context.principal_roles
+        return self.storage.principal_roles

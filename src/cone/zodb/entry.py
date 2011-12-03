@@ -21,7 +21,10 @@ from node.ext.zodb import (
 from zope.interface import implements
 from pyramid.threadlocal import get_current_request
 from cone.app.model import AppNode
-from cone.zodb.interfaces import IZODBEntryNode
+from cone.zodb.interfaces import (
+    IZODBEntry,
+    IZODBEntryNode,
+)
 
 
 def zodb_entry_for(node):
@@ -50,6 +53,7 @@ class ZODBEntryNode(OOBTNode):
 
 
 class ZODBEntryStorage(Storage):
+    implements(IZODBEntry)
     
     node_factory = default(ZODBEntryNode)
 
@@ -83,7 +87,7 @@ class ZODBEntryStorage(Storage):
     @extend
     @locktree
     def __delitem__(self, key):
-        del self.stotage[key]
+        del self.storage[key]
 
     @default
     @locktree

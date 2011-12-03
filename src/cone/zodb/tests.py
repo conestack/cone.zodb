@@ -13,7 +13,6 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 
 
 TESTFILES = [
-    #'README.rst',
     'common.rst',
     'entry.rst',
     'indexing.rst',

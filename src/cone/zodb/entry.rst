@@ -49,6 +49,19 @@ Create children::
     >>> foo.attrs.keys()
     ['title']
 
+IZODBEntry and IZODBEntryNode::
+
+    >>> from cone.zodb.interfaces import (
+    ...     IZODBEntry,
+    ...     IZODBEntryNode,
+    ... )
+    
+    >>> IZODBEntry.providedBy(entry)
+    True
+    
+    >>> IZODBEntryNode.providedBy(entry.storage)
+    True
+
 ZODBDummyNode is UUIDAware::
 
     >>> from node.interfaces import IUUIDAware
@@ -77,6 +90,28 @@ Entry and entry node result in the same tree::
     
     >>> foo.__parent__.__parent__
     <BaseNode object 'root' at ...>
+
+``__delitem__``::
+
+    >>> del entry['foo']
+    >>> entry.printtree()
+    <class 'cone.zodb.entry.ZODBEntry'>: myentry
+      <class 'cone.zodb.testing.ZODBDummyNode'>: bar
+
+``__call__`` delegates to storage, which is the ZODB entry node::
+
+    >>> entry()
+
+``zodb_entry_for``::
+
+    >>> from cone.zodb import zodb_entry_for
+    >>> zodb_entry_for(entry['bar'])
+    <ZODBEntry object 'myentry' at ...>
+    
+    >>> zodb_entry_for(entry.storage)
+    <ZODBEntry object 'myentry' at ...>
+    
+    >>> zodb_entry_for(root)
 
 DB name::
 

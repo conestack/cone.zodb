@@ -12,107 +12,7 @@ Setup environment::
     >>> request = layer.new_request()
     >>> request.environ['repoze.zodbconn.connection'] = connection
 
-Create node containing ZODBEntry::
 
-    >>> import uuid
-    >>> from cone.app.model import BaseNode
-    >>> from cone.zodb import ZODBEntry
-    >>> root = BaseNode(name='root')
-    >>> root['myentry'] = ZODBEntry()
-    >>> entry = root['myentry']
-    >>> entry
-    <ZODBEntry object 'myentry' at ...>
-
-Context of entry is looked up by given key from db root::
-
-    >>> entry.context
-    <ZODBEntryNode object 'myentry' at ...>
-    
-``metadata`` and ``properties`` are returned from entry::
-
-    >>> entry.context.metadata
-    <cone.app.model.Metadata object at ...>
-    
-    >>> entry.context.properties
-    <cone.app.model.Properties object at ...>
-
-Create children::
-
-    >>> from cone.zodb.tests import DummyZODBNode
-    >>> foo = DummyZODBNode()
-    >>> entry['foo'] = foo
-    >>> bar = DummyZODBNode()
-    >>> bar.attrs['title'] = 'bar'
-    >>> entry['bar'] = bar
-
-``__iter__``::
-
-    >>> [k for k in entry]
-    ['foo', 'bar']
-
-``__getitem__``::
-
-    >>> entry['foo']
-    <DummyZODBNode object 'foo' at ...>
-
-``keys``::
-
-    >>> foo.attrs.keys()
-    ['uid', 'title']
-
-It's a good idea to always store a UID for each ZODB node. For catalog aware
-ZODB nodes this is required::
-
-    >>> foo.attrs['uid']
-    UUID('...')
-
-Entry and entry node result in the same tree::
-
-    >>> entry.printtree()
-    <class 'cone.zodb.ZODBEntry'>: myentry
-      <class 'cone.zodb.tests.DummyZODBNode'>: foo
-      <class 'cone.zodb.tests.DummyZODBNode'>: bar
-    
-    >>> entry.context.printtree()
-    <class 'cone.zodb.ZODBEntryNode'>: myentry
-      <class 'cone.zodb.tests.DummyZODBNode'>: foo
-      <class 'cone.zodb.tests.DummyZODBNode'>: bar
-
-``__parent__``::
-   
-    >>> foo.__parent__
-    <ZODBEntryNode object 'myentry' at ...>
-    
-    >>> foo.__parent__.__parent__
-    <BaseNode object 'root' at ...>
-
-DB name::
-
-    >>> class CustomZODBEntry(ZODBEntry):
-    ...     @property
-    ...     def db_name(self):
-    ...         return 'custom_entry_storage'
-    ...     @property
-    ...     def name(self):
-    ...         return 'entry_storage'
-    
-    >>> root['custom_entry_storage'] = CustomZODBEntry(name='custom_entry')
-    >>> entry = root['custom_entry_storage']
-    >>> entry
-    <CustomZODBEntry object 'custom_entry_storage' at ...>
-    
-    >>> entry.name
-    'entry_storage'
-    
-    >>> child = DummyZODBNode()
-    >>> entry['child'] = child
-    
-    >>> child = entry['child']
-    >>> child.path
-    ['root', 'entry_storage', 'child']
-    
-    >>> entry.db_name
-    'custom_entry_storage'
 
 ZODBPrincipalACL::
 
@@ -207,11 +107,16 @@ Helper functions for catalog indexing::
 
 ``get_uid``::
 
+    >>> from node.parts import UUIDAware
+    >>> class UUIDNode(BaseNode):
+    ...     __metaclass__ = plumber
+    ...     __plumbing__ = UUIDAware
+    
     >>> from cone.zodb import get_uid
     >>> get_uid(BaseNode(), 'default')
     'default'
     
-    >>> get_uid(foo, 'default')
+    >>> get_uid(UUIDNode(), 'default')
     UUID('...')
 
 ``get_type``::

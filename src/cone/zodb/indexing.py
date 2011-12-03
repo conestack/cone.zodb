@@ -5,7 +5,9 @@ from repoze.catalog.document import DocumentMap
 from repoze.catalog.query import Eq
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.path import CatalogPathIndex
+from cone.app.interfaces import IWorkflowState
 from cone.app.model import AppRoot
+from cone.zodb.entry import ZODBEntryNode
 
 
 FLOORDATETIME = datetime.datetime(1980, 1, 1) # XXX tzinfo
@@ -97,6 +99,6 @@ def create_default_metadata(instance, node):
     metadata['app_path'] = app_path(node)
     metadata['title'] = node.attrs['title']
     metadata['combined_title'] = combined_title(node)
-    if hasattr(node, 'state'):
+    if IWorkflowState.providedBy(node):
         metadata['state'] = node.state
     return metadata

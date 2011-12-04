@@ -30,6 +30,5 @@ from cone.zodb.catalog import (
     CatalogProxy,
     CatalogIndexer,
     CatalogAware,
-    CatalogAwareZODBEntryNode,
-    CatalogAwareZODBEntry,
+    CatalogAwareEntry,
 )

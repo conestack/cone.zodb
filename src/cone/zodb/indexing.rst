@@ -93,6 +93,10 @@ Helper functions for catalog indexing::
     >>> get_state(object(), 'default')
     'default'
     
+    >>> from cone.app.interfaces import IWorkflowState
+    >>> from zope.interface import alsoProvides
+    >>> setattr(foo, 'state', 'state_1')
+    >>> alsoProvides(foo, IWorkflowState)
     >>> get_state(foo, 'default')
     'state_1'
 
@@ -108,7 +112,7 @@ Helper functions for catalog indexing::
 ``create_default_catalog``::
 
     >>> from cone.zodb import create_default_catalog
-    >>> create_default_catalog(None)
+    >>> create_default_catalog()
     {'app_path': <repoze.catalog.indexes.path.CatalogPathIndex object at ...>, 
     'uid': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
     'title': <repoze.catalog.indexes.field.CatalogFieldIndex object at ...>, 
@@ -123,7 +127,7 @@ Helper functions for catalog indexing::
     >>> from cone.zodb import create_default_metadata
     >>> setattr(bar, 'state', 'some_wf_state')
     >>> alsoProvides(bar, IWorkflowState)
-    >>> create_default_metadata(None, bar)
+    >>> create_default_metadata(bar)
     {'path': ['myentry', 'bar'], 
     'state': 'some_wf_state', 
     'title': 'Bar title', 

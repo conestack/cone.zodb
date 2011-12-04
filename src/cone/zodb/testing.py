@@ -22,6 +22,7 @@ from cone.zodb import (
     ZODBPrincipalACL,
     ZODBEntryPrincipalACL,
     CatalogAware,
+    CatalogAwareEntry,
 )
 
 
@@ -34,12 +35,22 @@ class ZODBDummyNode(OOBTNode):
     def __init__(self, name=None, parent=None):
         OOBTNode.__init__(self, name=name, parent=parent)
         self.attrs['title'] = 'foo'
-        self.state = 'state_1'
 
 
-class CatalogAwareZODBDummyNode(ZODBDummyNode):
+class CatalogAwareZODBNode(ZODBDummyNode):
     __metaclass__ = plumber
     __plumbing__ = CatalogAware
+
+
+class CatalogAwareZODBEntryNode(ZODBEntryNode):
+    __metaclass__ = plumber
+    __plumbing__ = CatalogAware
+
+
+class CatalogAwareZODBEntry(ZODBEntry):
+    __metaclass__ = plumber
+    __plumbing__ = CatalogAwareEntry
+    node_factory = CatalogAwareZODBEntryNode
 
 
 class ZODBPrincipalACLNode(ZODBNode):

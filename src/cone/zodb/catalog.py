@@ -1,3 +1,4 @@
+import uuid
 from plumber import (
     plumber,
     plumb,
@@ -9,11 +10,19 @@ from node.parts import UUIDAware
 from node.utils import instance_property
 from repoze.catalog.interfaces import ICatalog
 from repoze.catalog.document import DocumentMap
-from cone.zodb.interfaces import ICatalogAware
+from repoze.catalog.query import Eq
+from cone.zodb.interfaces import (
+    ICatalogAware,
+    IZODBEntryNode,
+)
 from cone.zodb.entry import (
     zodb_entry_for,
     ZODBEntryNode,
     ZODBEntry,
+)
+from cone.zodb.indexing import (
+    create_default_catalog,
+    create_default_metadata,
 )
 
 
@@ -39,8 +48,8 @@ class CatalogProxy(object):
         self.indexing_root = indexing_root
         self.catalog_key = catalog_key
         self.doc_map_key = doc_map_key
-        self.catalog_factory = create_default_catalog
-        self.catalog_docmap_factory = create_default_docmap
+        self.catalog_factory = catalog_factory
+        self.metadata_factory = metadata_factory
     
     @property
     def entry(self):
@@ -58,9 +67,9 @@ class CatalogProxy(object):
         return catalog
     
     @property
-    def doc_map(self, name):
+    def doc_map(self):
         entry = self.entry
-        doc_map = enty.db_root.get(self.doc_map_key)
+        doc_map = entry.db_root.get(self.doc_map_key)
         if doc_map and not isinstance(doc_map, DocumentMap):
             raise ValueError(
                 u'%s not a DocumentMap instance' % self.catalog_key)
@@ -126,24 +135,24 @@ class CatalogProxy(object):
 
 class CatalogIndexer(object):
     
-    def __init__(self, *proxies):
+    def __init__(self, proxies):
         self.proxies = proxies
     
+    def _proxy(self, func_name, node):
+        for proxy in self.proxies.values():
+            getattr(proxy, func_name)(node)
+    
     def index_doc(self, node):
-        for proxy in self.proxies:
-            proxy.index_doc(node)
+        self._proxy('index_doc', node)
     
     def index_recursiv(self, node):
-        for proxy in self.proxies:
-            proxy.index_recursiv(node)
+        self._proxy('index_recursiv', node)
     
     def unindex_doc(self, node):
-        for proxy in self.proxies:
-            proxy.unindex_doc(node)
+        self._proxy('unindex_doc', node)
     
     def unindex_recursiv(self, node):
-        for proxy in self.proxies:
-            proxy.unindex_recursiv(node)
+        self._proxy('unindex_recursiv', node)
 
 
 class CatalogAware(UUIDAware):
@@ -152,14 +161,11 @@ class CatalogAware(UUIDAware):
     @default
     @property
     def catalog_proxies(self):
-        return [CatalogProxy(
-            self,
-            zodb_entry_for(self),
-            'cone_catalog',
-            'cone_doc_map',
-            create_default_catalog,
-            create_default_metadata),
-        ]
+        proxies = dict()
+        proxies['default'] = CatalogProxy(
+            self, zodb_entry_for(self), 'cone_catalog', 'cone_doc_map',
+            create_default_catalog, create_default_metadata)
+        return proxies
     
     @default
     @property
@@ -183,10 +189,14 @@ class CatalogAware(UUIDAware):
             self.catalog_indexer.index_doc(self)
 
 
-class CatalogAwareZODBEntryNode(ZODBEntryNode):
-    __metaclass__ = plumber
-    __plumbing__ = CatalogAware
-
-
-class CatalogAwareZODBEntry(ZODBEntry):
-    node_factory = CatalogAwareZODBEntryNode
+class CatalogAwareEntry(CatalogAware):
+    
+    @default
+    @property
+    def catalog_proxies(self):
+        return self.storage.catalog_proxies
+    
+    @default
+    @property
+    def catalog_indexer(self):
+        return CatalogIndexer(self.storage.catalog_proxies)

@@ -82,7 +82,7 @@ def combined_title(node):
     return ' - '.join(titles)
 
 
-def create_default_catalog(instance):
+def create_default_catalog():
     catalog = Catalog()
     catalog['uid'] = CatalogFieldIndex(get_uid)
     catalog['type'] = CatalogFieldIndex(get_type)
@@ -93,11 +93,11 @@ def create_default_catalog(instance):
     return catalog
 
 
-def create_default_metadata(instance, node):
+def create_default_metadata(node):
     metadata = dict()
     metadata['path'] = zodb_path(node)
     metadata['app_path'] = app_path(node)
-    metadata['title'] = node.attrs['title']
+    metadata['title'] = node.attrs.get('title', node.name)
     metadata['combined_title'] = combined_title(node)
     if IWorkflowState.providedBy(node):
         metadata['state'] = node.state

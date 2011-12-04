@@ -98,11 +98,12 @@ Rebuild catalog::
     (3, IFSet([..., ..., ...]))
 
 Delete node. Gets unindexed recursive.::
-
+    
     >>> del entry['bar']
+    
     >>> entry.printtree()
-    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
+    <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
     
     >>> entry.catalog_proxies['default'].catalog.query(Eq('uid', bar_uid))
     (0, IFSet([]))
@@ -110,19 +111,25 @@ Delete node. Gets unindexed recursive.::
     >>> entry.catalog_proxies['default'].catalog.query(Eq('uid', child_uid))
     (0, IFSet([]))
     
+    >>> entry.catalog_proxies['default'].catalog.query(Eq('type', 'dummytype'))
+    (1, IFSet([...]))
+    
+    >>> entry.catalog_proxies['default'].rebuild_catalog()
+    1
+    
 Test moving of subtrees, if objects get indexed the right way::
 
-    >>> source = entry['source'] = CatalogAwareDummyNode()
-    >>> source['c1'] = CatalogAwareDummyNode()
-    >>> source['c2'] = CatalogAwareDummyNode()
-    >>> target = entry['target'] = CatalogAwareDummyNode()
+    >>> source = entry['source'] = CatalogAwareZODBNode()
+    >>> source['c1'] = CatalogAwareZODBNode()
+    >>> source['c2'] = CatalogAwareZODBNode()
+    >>> target = entry['target'] = CatalogAwareZODBNode()
     >>> entry.printtree()
-    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: source
-        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c1
-        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c2
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: target
+    <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
+      <class 'cone.zodb.testing.CatalogAwareZODBNode'>: source
+        <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c1
+        <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c2
+      <class 'cone.zodb.testing.CatalogAwareZODBNode'>: target
     
     >>> uid = source['c1'].uuid
     >>> [(k, v) for k, v in \
@@ -130,27 +137,25 @@ Test moving of subtrees, if objects get indexed the right way::
     [('app_path', ['root', 'catalog_aware', 'source', 'c1']), 
     ('combined_title', 'catalog_aware - foo - foo'), 
     ('path', ['catalog_aware', 'source', 'c1']), 
-    ('state', 'state_1'), 
     ('title', 'foo')]
     
     >>> to_move = entry.detach('source')
     >>> target[to_move.name] = to_move
-    >>> uid = target['source']['c1'].attrs['uid']
+    >>> uid = target['source']['c1'].uuid
     >>> [(k, v) for k, v in \
-        entry.catalog_proxies['default'].doc_metadata(str(uid)).items()]
+    ...     entry.catalog_proxies['default'].doc_metadata(str(uid)).items()]
     [('app_path', ['root', 'catalog_aware', 'target', 'source', 'c1']), 
     ('combined_title', 'catalog_aware - foo - foo - foo'), 
     ('path', ['catalog_aware', 'target', 'source', 'c1']), 
-    ('state', 'state_1'), 
     ('title', 'foo')]
     
     >>> entry.printtree()
-    <class 'cone.zodb.CatalogAwareZODBEntry'>: catalog_aware
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: foo
-      <class 'cone.zodb.tests.CatalogAwareDummyNode'>: target
-        <class 'cone.zodb.tests.CatalogAwareDummyNode'>: source
-          <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c1
-          <class 'cone.zodb.tests.CatalogAwareDummyNode'>: c2
+    <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
+      <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
+      <class 'cone.zodb.testing.CatalogAwareZODBNode'>: target
+        <class 'cone.zodb.testing.CatalogAwareZODBNode'>: source
+          <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c1
+          <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c2
     
     >>> entry.catalog_proxies['default'].catalog.query(
     ...     Eq('path', {'query': '/catalog_aware/target'}))
@@ -159,3 +164,63 @@ Test moving of subtrees, if objects get indexed the right way::
     >>> entry.catalog_proxies['default'].catalog.query(
     ...     Eq('path', {'query': '/catalog_aware/target/source'}))
     (3, IFSet([..., ..., ...]))
+
+Test CatalogIndexer::
+
+    >>> indexer = entry.catalog_indexer
+    >>> indexer
+    <cone.zodb.catalog.CatalogIndexer object at ...>
+    
+    >>> foo = entry['foo']
+    >>> indexer.unindex_doc(foo)
+    
+    >>> entry.catalog_proxies['default'].catalog.query(Eq('uid', foo.uuid))
+    (0, IFSet([]))
+    
+    >>> indexer.index_doc(foo)
+    >>> entry.catalog_proxies['default'].catalog.query(Eq('uid', foo.uuid))
+    (1, IFSet([...]))
+    
+    >>> target = entry['target']
+    >>> indexer.unindex_recursiv(target)
+    >>> entry.catalog_proxies['default'].catalog.query(
+    ...     Eq('path', {'query': '/catalog_aware'}))
+    (1, IFSet([...]))
+    
+    >>> indexer.index_recursiv(target)
+    >>> entry.catalog_proxies['default'].catalog.query(
+    ...     Eq('path', {'query': '/catalog_aware'}))
+    (5, IFSet([..., ..., ..., ..., ...]))
+
+Test pointing CatalogProxy to existing objects providing the wrong interface::
+
+    >>> from persistent import Persistent
+    >>> from cone.zodb import CatalogProxy
+    >>> from cone.zodb.indexing import (
+    ...     create_default_catalog,
+    ...     create_default_metadata,
+    ... )
+    >>> db_root = layer.zodb_root()
+    >>> db_root['invalid_catalog_object'] = Persistent()
+    >>> db_root['invalid_doc_map_object'] = Persistent()
+    
+    >>> proxy = CatalogProxy(
+    ...     entry['foo'], entry, 'invalid_catalog_object',
+    ...     'invalid_doc_map_object', create_default_catalog,
+    ...     create_default_metadata)
+    
+    >>> proxy.catalog
+    Traceback (most recent call last):
+      ...
+    ValueError: ICatalog not provided by invalid_catalog_object
+    
+    >>> proxy.doc_map
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid_catalog_object not a DocumentMap instance
+
+Re-init ZODB connection::
+
+    >>> import transaction
+    >>> transaction.commit()
+    >>> layer.init_zodb()

@@ -189,7 +189,7 @@ class CatalogAware(UUIDAware):
             self.catalog_indexer.index_doc(self)
 
 
-class CatalogAwareEntry(CatalogAware):
+class CatalogProvidingEntry(Part):
     
     @default
     @property

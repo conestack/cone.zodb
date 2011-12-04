@@ -22,7 +22,7 @@ from cone.zodb import (
     ZODBPrincipalACL,
     ZODBEntryPrincipalACL,
     CatalogAware,
-    CatalogAwareEntry,
+    CatalogProvidingEntry,
 )
 
 
@@ -49,7 +49,7 @@ class CatalogAwareZODBEntryNode(ZODBEntryNode):
 
 class CatalogAwareZODBEntry(ZODBEntry):
     __metaclass__ = plumber
-    __plumbing__ = CatalogAwareEntry
+    __plumbing__ = CatalogProvidingEntry
     node_factory = CatalogAwareZODBEntryNode
 
 
@@ -101,10 +101,10 @@ class ZODBLayer(Security):
         return request
     
     def init_zodb(self):
-        storage = FileStorage(os.path.join(self.tempdir, 'Data.fs'))
         if hasattr(self, 'zodb') and self.zodb:
             self.zodb_connection.close()
             self.zodb.close()
+        storage = FileStorage(os.path.join(self.tempdir, 'Data.fs'))
         self.zodb = DB(storage)
         self.zodb_connection = self.zodb.open()
     

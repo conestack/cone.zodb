@@ -7,6 +7,7 @@ from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.path import CatalogPathIndex
 from cone.app.interfaces import IWorkflowState
 from cone.app.model import AppRoot
+from cone.zodb.interfaces import IZODBEntryNode
 from cone.zodb.entry import ZODBEntryNode
 
 
@@ -75,7 +76,7 @@ def combined_title(node):
     titles = list()
     while True:
         titles.append(node.attrs.get('title', node.name))
-        if node.parent is None or isinstance(node, ZODBEntryNode):
+        if node.parent is None or IZODBEntryNode.providedBy(node):
             break
         node = node.parent
     titles.reverse()

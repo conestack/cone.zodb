@@ -190,6 +190,9 @@ class CatalogAware(UUIDAware):
 
 
 class CatalogProvidingEntry(Part):
+    """Helper part for ZODB entries to provide ``catalog_proxies`` and
+    ``catalog_indexer`` directly.
+    """
     
     @default
     @property

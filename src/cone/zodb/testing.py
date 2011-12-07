@@ -7,14 +7,16 @@ from plumber import (
 )
 from ZODB.FileStorage import FileStorage
 from ZODB.DB import DB
-from node.parts import UUIDAware
 from node.ext.zodb import (
     ZODBNode,
     OOBTNode,
 )
 from cone.app import root
 from cone.app.testing import Security
-from cone.app.model import AppNode
+from cone.app.model import (
+    AppNode,
+    UUIDAttributeAware,
+)
 from cone.app.security import DEFAULT_ACL
 from cone.zodb import (
     ZODBEntry,
@@ -28,7 +30,7 @@ from cone.zodb import (
 
 class ZODBDummyNode(OOBTNode):
     __metaclass__ = plumber
-    __plumbing__ = UUIDAware
+    __plumbing__ = UUIDAttributeAware
     
     node_info_name = 'dummytype'
     
@@ -56,10 +58,6 @@ class CatalogAwareZODBEntry(ZODBEntry):
 class ZODBPrincipalACLNode(ZODBNode):
     __metaclass__ = plumber
     __plumbing__ = AppNode, ZODBPrincipalACL
-    
-    @property
-    def __acl__(self):
-        return DEFAULT_ACL
 
     
 class ZODBPrincipalACLEntryNode(ZODBEntryNode):
@@ -74,12 +72,7 @@ class ZODBPrincipalACLEntryNode(ZODBEntryNode):
 class ZODBPrincipalACLEntry(ZODBEntry):
     __metaclass__ = plumber
     __plumbing__ = ZODBEntryPrincipalACL
-    
     node_factory = ZODBPrincipalACLEntryNode
-    
-    @property
-    def __acl__(self):
-        return DEFAULT_ACL
 
 
 class ZODBLayer(Security):

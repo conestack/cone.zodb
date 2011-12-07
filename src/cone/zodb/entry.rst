@@ -47,7 +47,7 @@ Create children::
 ``keys``::
 
     >>> foo.attrs.keys()
-    ['title']
+    ['title', 'uuid']
 
 IZODBEntry and IZODBEntryNode::
 

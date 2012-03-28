@@ -96,6 +96,7 @@ def create_default_catalog():
 
 def create_default_metadata(node):
     metadata = dict()
+    metadata['uid'] = node.uuid
     metadata['path'] = zodb_path(node)
     metadata['app_path'] = app_path(node)
     metadata['title'] = node.attrs.get('title', node.name)

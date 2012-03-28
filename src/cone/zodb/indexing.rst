@@ -128,8 +128,9 @@ Helper functions for catalog indexing::
     >>> setattr(bar, 'state', 'some_wf_state')
     >>> alsoProvides(bar, IWorkflowState)
     >>> create_default_metadata(bar)
-    {'path': ['myentry', 'bar'], 
-    'state': 'some_wf_state', 
+    {'app_path': ['root', 'myentry', 'bar'], 
+    'uid': UUID('...'), 
     'title': 'Bar title', 
+    'state': 'some_wf_state', 
     'combined_title': 'myentry - Bar title', 
-    'app_path': ['root', 'myentry', 'bar']}
+    'path': ['myentry', 'bar']}

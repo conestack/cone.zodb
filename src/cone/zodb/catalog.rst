@@ -52,7 +52,8 @@ Check metadata::
     [('app_path', ['root', 'catalog_aware', 'foo']), 
     ('combined_title', 'catalog_aware - foo'), 
     ('path', ['catalog_aware', 'foo']), 
-    ('title', 'foo')]
+    ('title', 'foo'), 
+    ('uid', UUID('...'))]
 
 Reindexing happens at ``__call__`` time::
 
@@ -63,7 +64,8 @@ Reindexing happens at ``__call__`` time::
     [('app_path', ['root', 'catalog_aware', 'foo']), 
     ('combined_title', 'catalog_aware - foo changed'), 
     ('path', ['catalog_aware', 'foo']), 
-    ('title', 'foo changed')]
+    ('title', 'foo changed'), 
+    ('uid', UUID('...'))]
 
 Calling the ZODB entry delegates to refering ZODB entry node::
 
@@ -137,7 +139,8 @@ Test moving of subtrees, if objects get indexed the right way::
     [('app_path', ['root', 'catalog_aware', 'source', 'c1']), 
     ('combined_title', 'catalog_aware - foo - foo'), 
     ('path', ['catalog_aware', 'source', 'c1']), 
-    ('title', 'foo')]
+    ('title', 'foo'), 
+    ('uid', UUID('...'))]
     
     >>> to_move = entry.detach('source')
     >>> target[to_move.name] = to_move
@@ -147,7 +150,8 @@ Test moving of subtrees, if objects get indexed the right way::
     [('app_path', ['root', 'catalog_aware', 'target', 'source', 'c1']), 
     ('combined_title', 'catalog_aware - foo - foo - foo'), 
     ('path', ['catalog_aware', 'target', 'source', 'c1']), 
-    ('title', 'foo')]
+    ('title', 'foo'), 
+    ('uid', UUID('...'))]
     
     >>> entry.printtree()
     <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware

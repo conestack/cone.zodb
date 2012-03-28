@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.9pre1'
+version = '0.9pre2'
 shortdesc = 'cone ZODB integration'
 longdesc = ''
 

@@ -33,12 +33,15 @@ setup(name='cone.zodb',
           'node.ext.zodb',
           'repoze.catalog',
       ],
-      extras_require = dict(
+      extras_require=dict(
           test=[
-              'interlude',
-              ]),
+                'interlude',
+                'plone.testing',
+                'unittest2',
+          ]
+      ),
       tests_require=[
           'interlude',
-          ],
+      ],
       test_suite = "cone.zodb.tests.test_suite",
       )

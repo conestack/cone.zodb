@@ -18,7 +18,7 @@ from node.ext.zodb import (
     IZODBNode,
     OOBTNode,
 )
-from zope.interface import implements
+from zope.interface import implementer
 from pyramid.threadlocal import get_current_request
 from cone.app.model import AppNode
 from cone.zodb.interfaces import (
@@ -36,8 +36,8 @@ def zodb_entry_for(node):
         node = node.parent
 
 
+@implementer(IZODBEntryNode)
 class ZODBEntryNode(OOBTNode):
-    implements(IZODBEntryNode)
 
     @property
     def __parent__(self):
@@ -52,9 +52,8 @@ class ZODBEntryNode(OOBTNode):
         return self.parent.properties
 
 
+@implementer(IZODBEntry)
 class ZODBEntryStorage(Storage):
-    implements(IZODBEntry)
-    
     node_factory = default(ZODBEntryNode)
 
     @default

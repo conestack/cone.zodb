@@ -5,7 +5,7 @@ from plumber import (
     default,
     Part,
 )
-from zope.interface import implements
+from zope.interface import implementer
 from node.parts import UUIDAware
 from node.utils import instance_property
 from repoze.catalog.interfaces import ICatalog
@@ -155,8 +155,8 @@ class CatalogIndexer(object):
         self._proxy('unindex_recursiv', node)
 
 
+@implementer(ICatalogAware)
 class CatalogAware(UUIDAware):
-    implements(ICatalogAware)
     
     @default
     @property

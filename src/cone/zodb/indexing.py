@@ -69,6 +69,10 @@ def get_state(node, default):
 
 
 def get_title(node, default):
+    if hasattr(node, 'metadata'):
+        title = node.metadata.title
+        if title:
+            return title
     return node.attrs.get('title', default)
 
 
@@ -99,7 +103,7 @@ def create_default_metadata(node):
     metadata['uid'] = node.uuid
     metadata['path'] = zodb_path(node)
     metadata['app_path'] = app_path(node)
-    metadata['title'] = node.attrs.get('title', node.name)
+    metadata['title'] = get_title(node, node.name)
     metadata['combined_title'] = combined_title(node)
     if IWorkflowState.providedBy(node):
         metadata['state'] = node.state

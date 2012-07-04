@@ -100,14 +100,22 @@ Helper functions for catalog indexing::
     >>> get_state(foo, 'default')
     'state_1'
 
-``get_title``::
+``get_title`` First ``node.metadata``, then ``node.attrs`` are searched for
+title. finally default takes effect::
 
     >>> from cone.zodb import get_title
-    >>> get_title(BaseNode(), 'default')
-    'default'
-    
     >>> get_title(foo, 'default')
     'foo'
+    
+    >>> get_title(BaseNode(), 'default')
+    u'no_title'
+    
+    >>> class NoTitleNode(BaseNode):
+    ...     @property
+    ...     def metadata(self):
+    ...         return Metadata()
+    >>> get_title(NoTitleNode(), 'default')
+    'default'
 
 ``create_default_catalog``::
 

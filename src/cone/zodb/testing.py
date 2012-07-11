@@ -6,6 +6,7 @@ from plumber import (
     default,
 )
 from ZODB.FileStorage import FileStorage
+from ZODB.blob import BlobStorage
 from ZODB.DB import DB
 from node.ext.zodb import (
     ZODBNode,
@@ -97,8 +98,12 @@ class ZODBLayer(Security):
         if hasattr(self, 'zodb') and self.zodb:
             self.zodb_connection.close()
             self.zodb.close()
-        storage = FileStorage(os.path.join(self.tempdir, 'Data.fs'))
-        self.zodb = DB(storage)
+        filestorage_dir = os.path.join(self.tempdir, 'Data.fs')
+        filestorage = FileStorage(filestorage_dir)
+        blobstorage_dir = os.path.join(self.tempdir, 'blobstorage')
+        blobstorage = BlobStorage(blobstorage_dir, filestorage,
+                                  layout='automatic')
+        self.zodb = DB(blobstorage)
         self.zodb_connection = self.zodb.open()
     
     def zodb_root(self):

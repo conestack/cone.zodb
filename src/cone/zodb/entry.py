@@ -1,9 +1,9 @@
 from plumber import (
     plumber,
     default,
-    extend,
+    override,
 )
-from node.parts import (
+from node.behaviors import (
     AsAttrAccess,
     NodeChildValidate,
     Nodespaces,
@@ -78,12 +78,12 @@ class ZODBEntryStorage(Storage):
         entry.__parent__ = self
         return entry
     
-    @extend
+    @override
     @locktree
     def __setitem__(self, key, val):
         self.storage[key] = val
 
-    @extend
+    @override
     @locktree
     def __delitem__(self, key):
         del self.storage[key]

@@ -3,10 +3,10 @@ from plumber import (
     plumber,
     plumb,
     default,
-    Part,
+    Behavior,
 )
 from zope.interface import implementer
-from node.parts import UUIDAware
+from node.behaviors import UUIDAware
 from node.utils import instance_property
 from repoze.catalog.interfaces import ICatalog
 from repoze.catalog.document import DocumentMap
@@ -189,8 +189,8 @@ class CatalogAware(UUIDAware):
             self.catalog_indexer.index_doc(self)
 
 
-class CatalogProvidingEntry(Part):
-    """Helper part for ZODB entries to provide ``catalog_proxies`` and
+class CatalogProvidingEntry(Behavior):
+    """Helper behavior for ZODB entries to provide ``catalog_proxies`` and
     ``catalog_indexer`` directly.
     """
     

@@ -66,7 +66,7 @@ Helper functions for catalog indexing::
 ``get_uid``::
 
     >>> from plumber import plumber
-    >>> from node.parts import UUIDAware
+    >>> from node.behaviors import UUIDAware
     >>> class UUIDNode(BaseNode):
     ...     __metaclass__ = plumber
     ...     __plumbing__ = UUIDAware

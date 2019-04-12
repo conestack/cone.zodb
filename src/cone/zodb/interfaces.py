@@ -1,8 +1,6 @@
-from node.interfaces import (
-    IStorage,
-    IUUIDAware,
-)
 from node.ext.zodb import IZODBNode
+from node.interfaces import IStorage
+from node.interfaces import IUUIDAware
 
 
 class IZODBEntry(IStorage):

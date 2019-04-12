@@ -1,33 +1,21 @@
-import uuid
-from plumber import (
-    plumber,
-    plumb,
-    default,
-    Behavior,
-)
-from zope.interface import implementer
+from cone.zodb.entry import zodb_entry_for
+from cone.zodb.indexing import create_default_catalog
+from cone.zodb.indexing import create_default_metadata
+from cone.zodb.interfaces import ICatalogAware
+from cone.zodb.interfaces import IZODBEntryNode
 from node.behaviors import UUIDAware
-from node.utils import instance_property
-from repoze.catalog.interfaces import ICatalog
+from plumber import Behavior
+from plumber import default
+from plumber import plumb
 from repoze.catalog.document import DocumentMap
+from repoze.catalog.interfaces import ICatalog
 from repoze.catalog.query import Eq
-from cone.zodb.interfaces import (
-    ICatalogAware,
-    IZODBEntryNode,
-)
-from cone.zodb.entry import (
-    zodb_entry_for,
-    ZODBEntryNode,
-    ZODBEntry,
-)
-from cone.zodb.indexing import (
-    create_default_catalog,
-    create_default_metadata,
-)
+from zope.interface import implementer
+import uuid
 
 
 class CatalogProxy(object):
-    
+
     def __init__(self, dbcontext, indexing_root, catalog_key,
                  doc_map_key, catalog_factory, metadata_factory):
         """
@@ -50,11 +38,11 @@ class CatalogProxy(object):
         self.doc_map_key = doc_map_key
         self.catalog_factory = catalog_factory
         self.metadata_factory = metadata_factory
-    
+
     @property
     def entry(self):
         return zodb_entry_for(self.dbcontext)
-    
+
     @property
     def catalog(self):
         entry = self.entry
@@ -65,7 +53,7 @@ class CatalogProxy(object):
             self.reset_catalog()
             catalog = entry.db_root[self.catalog_key]
         return catalog
-    
+
     @property
     def doc_map(self):
         entry = self.entry
@@ -77,7 +65,7 @@ class CatalogProxy(object):
             entry.db_root[self.doc_map_key] = DocumentMap()
             doc_map = entry.db_root[self.doc_map_key]
         return doc_map
-    
+
     def rebuild_catalog(self):
         self.reset_catalog()
         self._index_count = 0
@@ -110,7 +98,7 @@ class CatalogProxy(object):
         metadata = self.metadata_factory(node)
         doc_map.add_metadata(docid, metadata)
         catalog.index_doc(docid, node)
-    
+
     def index_recursiv(self, node):
         if ICatalogAware.providedBy(node):
             self.index_doc(node)
@@ -134,30 +122,30 @@ class CatalogProxy(object):
 
 
 class CatalogIndexer(object):
-    
+
     def __init__(self, proxies):
         self.proxies = proxies
-    
+
     def _proxy(self, func_name, node):
         for proxy in self.proxies.values():
             getattr(proxy, func_name)(node)
-    
+
     def index_doc(self, node):
         self._proxy('index_doc', node)
-    
+
     def index_recursiv(self, node):
         self._proxy('index_recursiv', node)
-    
+
     def unindex_doc(self, node):
         self._proxy('unindex_doc', node)
-    
+
     def unindex_recursiv(self, node):
         self._proxy('unindex_recursiv', node)
 
 
 @implementer(ICatalogAware)
 class CatalogAware(UUIDAware):
-    
+
     @default
     @property
     def catalog_proxies(self):
@@ -166,22 +154,22 @@ class CatalogAware(UUIDAware):
             self, zodb_entry_for(self), 'cone_catalog', 'cone_doc_map',
             create_default_catalog, create_default_metadata)
         return proxies
-    
+
     @default
     @property
     def catalog_indexer(self):
         return CatalogIndexer(self.catalog_proxies)
-    
+
     @plumb
     def __setitem__(_next, self, key, value):
         _next(self, key, value)
         self.catalog_indexer.index_recursiv(self[key])
-    
+
     @plumb
     def __delitem__(_next, self, key):
         self.catalog_indexer.unindex_recursiv(self[key])
         _next(self, key)
-    
+
     @plumb
     def __call__(_next, self):
         _next(self)
@@ -193,12 +181,12 @@ class CatalogProvidingEntry(Behavior):
     """Helper behavior for ZODB entries to provide ``catalog_proxies`` and
     ``catalog_indexer`` directly.
     """
-    
+
     @default
     @property
     def catalog_proxies(self):
         return self.storage.catalog_proxies
-    
+
     @default
     @property
     def catalog_indexer(self):

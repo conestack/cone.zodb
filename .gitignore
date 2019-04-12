@@ -1,14 +1,5 @@
 *.pyc
 *.pyo
-*.wpr
-*.mo
 *.egg-info
-*~
-.*
-!.gitignore
-bin
-develop-eggs
-devsrc
-eggs
-parts
-dist
+/py2/
+/py3/

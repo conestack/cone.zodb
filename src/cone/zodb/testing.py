@@ -98,4 +98,4 @@ class ZODBLayer(Security):
         return self.zodb_connection.root()
 
 
-layer = ZODBLayer()
+zodb_layer = ZODBLayer()

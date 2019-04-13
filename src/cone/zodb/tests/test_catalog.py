@@ -105,13 +105,12 @@ class TestCatalog(NodeTestCase):
         child.attrs['title'] = 'Child of bar'
         child()
 
-        # XXX: also test on entry.treerepr()
         self.check_output("""
-        <class 'cone.zodb.testing.CatalogAwareZODBEntryNode'>: catalog_aware
+        <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: bar
             <class 'cone.zodb.testing.CatalogAwareZODBNode'>: child
-        """, entry.storage.treerepr())
+        """, entry.treerepr())
 
         bar_uid = bar.uuid
         res = entry.catalog_proxies['default'].catalog.query(Eq('uid', bar_uid))

@@ -11,6 +11,7 @@ from node.behaviors import Nodify
 from node.behaviors import Storage
 from node.ext.zodb import IZODBNode
 from node.ext.zodb import OOBTNode
+from node.interfaces import IOrdered
 from node.locking import locktree
 from plumber import default
 from plumber import override
@@ -96,5 +97,6 @@ class ZODBEntryStorage(Storage):
     Nodify,
     Lifecycle,
     ZODBEntryStorage)
+@implementer(IOrdered)
 class ZODBEntry(object):
     pass

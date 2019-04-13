@@ -1,0 +1,113 @@
+from cone.app.model import BaseNode
+from cone.app.model import Metadata
+from cone.app.model import Properties
+from cone.zodb import testing
+from cone.zodb import zodb_entry_for
+from cone.zodb import ZODBEntry
+from cone.zodb import ZODBEntryNode
+from cone.zodb.interfaces import IZODBEntry
+from cone.zodb.interfaces import IZODBEntryNode
+from cone.zodb.testing import ZODBDummyNode
+from node.interfaces import IUUIDAware
+from node.tests import NodeTestCase
+import transaction
+import uuid
+
+
+class TestEntry(NodeTestCase):
+    layer = testing.zodb_layer
+
+    def test_entry(self):
+        self.layer.new_request()
+
+        # Create node containing ZODBEntry
+        root = BaseNode(name='root')
+        root['myentry'] = ZODBEntry()
+        entry = root['myentry']
+        self.assertTrue(isinstance(entry, ZODBEntry))
+
+        # ZODB entry node of entry is looked up by db_name from db root
+        self.assertTrue(isinstance(entry.storage, ZODBEntryNode))
+        self.assertEqual(entry.storage.name, 'myentry')
+
+        # ``metadata`` and ``properties`` are returned from entry
+        self.assertTrue(isinstance(entry.storage.metadata, Metadata))
+        self.assertTrue(isinstance(entry.storage.properties, Properties))
+
+        # Create children
+        foo = ZODBDummyNode()
+        entry['foo'] = foo
+        bar = ZODBDummyNode()
+        bar.attrs['title'] = 'bar'
+        entry['bar'] = bar
+
+        # ``__iter__``
+        self.assertEqual([k for k in entry], ['foo', 'bar'])
+
+        # ``__getitem__``
+        self.assertTrue(entry['foo'] is foo)
+
+        # ``keys``
+        self.assertEqual(foo.attrs.keys(), ['title', 'uuid'])
+
+        # IZODBEntry and IZODBEntryNode
+        self.assertTrue(IZODBEntry.providedBy(entry))
+        self.assertTrue(IZODBEntryNode.providedBy(entry.storage))
+
+        # ZODBDummyNode is UUIDAware
+        self.assertTrue(IUUIDAware.providedBy(foo))
+        self.assertTrue(isinstance(foo.uuid, uuid.UUID))
+
+        # Entry and entry node result in the same tree
+        self.check_output("""
+        <class 'cone.zodb.entry.ZODBEntry'>: myentry
+          <class 'cone.zodb.testing.ZODBDummyNode'>: foo
+          <class 'cone.zodb.testing.ZODBDummyNode'>: bar
+        """, entry.treerepr())
+
+        self.check_output("""
+        <class 'cone.zodb.entry.ZODBEntryNode'>: myentry
+          <class 'cone.zodb.testing.ZODBDummyNode'>: foo
+          <class 'cone.zodb.testing.ZODBDummyNode'>: bar
+        """, entry.storage.treerepr())
+
+        # ``__parent__``
+        self.assertTrue(foo.parent is entry.storage)
+        self.assertTrue(foo.parent.parent is root)
+
+        # ``__delitem__``
+        del entry['foo']
+        self.check_output("""
+        <class 'cone.zodb.entry.ZODBEntry'>: myentry
+          <class 'cone.zodb.testing.ZODBDummyNode'>: bar
+        """, entry.treerepr())
+
+        # ``__call__`` delegates to storage, which is the ZODB entry node
+        entry()
+
+        # ``zodb_entry_for``
+        self.assertTrue(zodb_entry_for(entry['bar']) is entry)
+        self.assertTrue(zodb_entry_for(entry.storage) is entry)
+        self.assertTrue(zodb_entry_for(root) is None)
+
+        # DB name
+        class CustomZODBEntry(ZODBEntry):
+            @property
+            def db_name(self):
+                return 'custom_entry_storage'
+
+            @property
+            def name(self):
+                return 'entry_storage'
+
+        root['custom_entry_storage'] = CustomZODBEntry(name='custom_entry')
+        entry = root['custom_entry_storage']
+        self.assertEqual(entry.name, 'entry_storage')
+
+        child = ZODBDummyNode()
+        entry['child'] = child
+        child = entry['child']
+        self.assertEqual(child.path, ['root', 'entry_storage', 'child'])
+        self.assertEqual(entry.db_name, 'custom_entry_storage')
+
+        transaction.commit()

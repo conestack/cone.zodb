@@ -1,17 +1,15 @@
-import datetime
-from node.interfaces import IUUIDAware
-from repoze.catalog.catalog import Catalog
-from repoze.catalog.document import DocumentMap
-from repoze.catalog.query import Eq
-from repoze.catalog.indexes.field import CatalogFieldIndex
-from repoze.catalog.indexes.path import CatalogPathIndex
 from cone.app.interfaces import IWorkflowState
 from cone.app.model import AppRoot
-from cone.zodb.interfaces import IZODBEntryNode
 from cone.zodb.entry import ZODBEntryNode
+from cone.zodb.interfaces import IZODBEntryNode
+from node.interfaces import IUUIDAware
+from repoze.catalog.catalog import Catalog
+from repoze.catalog.indexes.field import CatalogFieldIndex
+from repoze.catalog.indexes.path import CatalogPathIndex
+import datetime
 
 
-FLOORDATETIME = datetime.datetime(1980, 1, 1) # XXX tzinfo
+FLOORDATETIME = datetime.datetime(1980, 1, 1)  # XXX tzinfo
 
 
 def force_dt(value):

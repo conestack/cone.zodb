@@ -49,6 +49,8 @@ setup(
         'setuptools',
         'node.ext.zodb',
         'repoze.catalog',
+        'pyramid_tm',
+        'pyramid_zodbconn',
         'cone.app',
     ],
     extras_require=dict(test=['zope.testrunner']),

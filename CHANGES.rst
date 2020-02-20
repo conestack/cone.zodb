@@ -6,6 +6,9 @@ Changes
 1.0a1 (unreleased)
 ------------------
 
+- Use ``pyramid_zodbconn`` instead of ``repoze.zodbconn``.
+  [rnix]
+
 - Set ``node.interfaces.IOrdered`` on ``cone.zodb.entry.ZODBEntry`` to fix
   ``treerepr``.
   [rnix]

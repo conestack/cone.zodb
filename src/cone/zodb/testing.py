@@ -76,7 +76,7 @@ class ZODBLayer(Security):
 
     def new_request(self):
         request = super(ZODBLayer, self).new_request()
-        request.environ['repoze.zodbconn.connection'] = self.zodb_connection
+        setattr(request, '_primary_zodb_conn', self.zodb_connection)
         return request
 
     def init_zodb(self):

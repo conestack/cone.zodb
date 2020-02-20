@@ -17,6 +17,7 @@ from plumber import default
 from plumber import override
 from plumber import plumbing
 from pyramid.threadlocal import get_current_request
+from pyramid_zodbconn import get_connection
 from zope.interface import implementer
 
 
@@ -57,8 +58,8 @@ class ZODBEntryStorage(Storage):
     @default
     @property
     def db_root(self):
-        # XXX: should be configurable somehow
-        conn = get_current_request().environ['repoze.zodbconn.connection']
+        # XXX: currently primary DB only, support named DB
+        conn = get_connection(get_current_request())
         return conn.root()
 
     @default

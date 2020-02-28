@@ -6,6 +6,9 @@ Changes
 1.0a1 (unreleased)
 ------------------
 
+- Add ``__parent__`` setter function to ``ZODBEntryNode``.
+  [rnix]
+
 - Use ``pyramid_zodbconn`` instead of ``repoze.zodbconn``.
   [rnix]
 

@@ -37,6 +37,10 @@ class ZODBEntryNode(OOBTNode):
     def __parent__(self):
         return self._v_parent.parent
 
+    @__parent__.setter
+    def __parent__(self, value):
+        self._v_parent = value
+
     @property
     def metadata(self):
         return self.parent.metadata

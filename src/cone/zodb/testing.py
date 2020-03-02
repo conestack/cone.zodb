@@ -43,6 +43,16 @@ class CatalogAwareZODBEntry(ZODBEntry):
     node_factory = CatalogAwareZODBEntryNode
 
 
+@plumbing(CatalogAware, UUIDAttributeAware)
+class CatalogIncludedZODBEntryNode(ZODBEntryNode):
+    include_entry = True
+
+
+@plumbing(CatalogProvidingEntry)
+class CatalogIncludedZODBEntry(ZODBEntry):
+    node_factory = CatalogIncludedZODBEntryNode
+
+
 @plumbing(AppNode, ZODBPrincipalACL)
 class ZODBPrincipalACLNode(ZODBNode):
     pass

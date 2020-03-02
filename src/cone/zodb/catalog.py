@@ -145,6 +145,9 @@ class CatalogIndexer(object):
 
 @implementer(ICatalogAware)
 class CatalogAware(UUIDAware):
+    include_entry = default(False)
+    """Flag controls whether to index entry node in calatog.
+    """
 
     @default
     @property
@@ -161,6 +164,12 @@ class CatalogAware(UUIDAware):
         return CatalogIndexer(self.catalog_proxies)
 
     @plumb
+    def __init__(_next, self, *args, **kwargs):
+        _next(self, *args, **kwargs)
+        if self.include_entry and IZODBEntryNode.providedBy(self):
+            self.catalog_indexer.index_doc(self)
+
+    @plumb
     def __setitem__(_next, self, key, value):
         _next(self, key, value)
         self.catalog_indexer.index_recursiv(self[key])
@@ -173,8 +182,9 @@ class CatalogAware(UUIDAware):
     @plumb
     def __call__(_next, self):
         _next(self)
-        if not IZODBEntryNode.providedBy(self):
-            self.catalog_indexer.index_doc(self)
+        if IZODBEntryNode.providedBy(self) and not self.include_entry:
+            return
+        self.catalog_indexer.index_doc(self)
 
 
 class CatalogProvidingEntry(Behavior):

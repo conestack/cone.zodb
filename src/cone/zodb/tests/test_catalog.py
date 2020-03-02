@@ -7,6 +7,7 @@ from cone.zodb.indexing import create_default_catalog
 from cone.zodb.indexing import create_default_metadata
 from cone.zodb.testing import CatalogAwareZODBEntry
 from cone.zodb.testing import CatalogAwareZODBNode
+from cone.zodb.testing import CatalogIncludedZODBEntry
 from node.tests import NodeTestCase
 from persistent import Persistent
 from repoze.catalog.catalog import Catalog
@@ -278,6 +279,21 @@ class TestCatalog(NodeTestCase):
         )
         expected = 'invalid_catalog_object not a DocumentMap instance'
         self.assertEqual(str(err), expected)
+
+        entry = root['catalog_included'] = CatalogIncludedZODBEntry()
+        entry.attrs['title'] = 'Calatog Included'
+        uid = entry.storage.uuid
+        res = entry.catalog_proxies['default'].catalog.query(Eq('uid', uid))
+        self.assertEqual(res[0], 1)
+        self.assertEqual(len(res[1]), 1)
+
+        self.assertEqual([
+            ('app_path', ['root', 'catalog_included']),
+            ('combined_title', 'catalog_included'),
+            ('path', ['catalog_included']),
+            ('title', 'catalog_included'),
+            ('uid', uid)
+        ], list(entry.catalog_proxies['default'].doc_metadata(str(uid)).items()))
 
         # Re-init ZODB connection
         transaction.commit()

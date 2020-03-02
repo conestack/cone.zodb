@@ -30,6 +30,9 @@ class TestEntry(NodeTestCase):
         self.assertTrue(isinstance(entry.storage, ZODBEntryNode))
         self.assertEqual(entry.storage.name, 'myentry')
 
+        self.assertTrue(entry.storage._v_parent is entry)
+        self.assertTrue(entry.storage.entry is entry)
+
         self.assertTrue(entry.storage._v_parent.parent is root)
         self.assertTrue(entry.storage.__parent__ is root)
         self.assertTrue(entry.storage.parent is root)

@@ -24,7 +24,7 @@ from zope.interface import implementer
 def zodb_entry_for(node):
     while node:
         if IZODBEntryNode.providedBy(node):
-            return node._v_parent
+            return node.entry
         if node.parent is None or not IZODBNode.providedBy(node):
             return None
         node = node.parent
@@ -42,12 +42,16 @@ class ZODBEntryNode(OOBTNode):
         self._v_parent = value
 
     @property
+    def entry(self):
+        return self._v_parent
+
+    @property
     def metadata(self):
-        return self.parent.metadata
+        return self.entry.metadata
 
     @property
     def properties(self):
-        return self.parent.properties
+        return self.entry.properties
 
 
 @implementer(IZODBEntry)
@@ -71,9 +75,10 @@ class ZODBEntryStorage(Storage):
     def storage(self):
         entry = self.db_root.get(self.db_name)
         if not entry:
-            entry = self.node_factory(name=self.name)
+            entry = self.node_factory(name=self.name, parent=self)
             self.db_root[self.db_name] = entry
-        entry.__parent__ = self
+        else:
+            entry.__parent__ = self
         return entry
 
     @override

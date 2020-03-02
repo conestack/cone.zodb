@@ -6,6 +6,13 @@ Changes
 1.0a1 (unreleased)
 ------------------
 
+- Add ``include_entry`` attribute to ``CatalogAware`` behavior. Flag controls
+  whether to index entry node in calatog.
+  [rnix]
+
+- Add ``entry`` property to ``ZODBEntryNode``.
+  [rnix]
+
 - Add ``__parent__`` setter function to ``ZODBEntryNode``.
   [rnix]
 

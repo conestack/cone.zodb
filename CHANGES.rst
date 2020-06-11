@@ -6,6 +6,11 @@ Changes
 1.0a1 (unreleased)
 ------------------
 
+- Do not remember ``principal_roles`` via ``instance_property`` decorator
+  on ``ZODBEntryPrincipalACL`` to avoid ``ZODB.POSException.ConnectionStateError``
+  errors.
+  [rnix]
+
 - Proper handling of ``ZODBEntry`` in ``zodb_path``.
   [rnix]
 

@@ -17,6 +17,6 @@ class ZODBPrincipalACL(PrincipalACL):
 class ZODBEntryPrincipalACL(PrincipalACL):
 
     @default
-    @instance_property
+    @property
     def principal_roles(self):
         return self.storage.principal_roles

@@ -6,6 +6,9 @@ Changes
 1.0a1 (unreleased)
 ------------------
 
+- Proper handling of ``ZODBEntry`` in ``zodb_path``.
+  [rnix]
+
 - Add ``include_entry`` attribute to ``CatalogAware`` behavior. Flag controls
   whether to index entry node in calatog.
   [rnix]

@@ -1,5 +1,6 @@
 from cone.app.interfaces import IWorkflowState
 from cone.app.model import AppRoot
+from cone.zodb.entry import ZODBEntry
 from cone.zodb.entry import ZODBEntryNode
 from cone.zodb.interfaces import IZODBEntryNode
 from node.interfaces import IUUIDAware
@@ -21,6 +22,8 @@ def force_dt(value):
 def zodb_path(node, default=None):
     path = list()
     while True:
+        if isinstance(node, ZODBEntry):
+            node = node.storage
         path.append(node.name)
         if node.parent is None or isinstance(node, ZODBEntryNode):
             path.reverse()

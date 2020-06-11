@@ -40,6 +40,8 @@ class TestIndexing(NodeTestCase):
         self.assertEqual(foo.path, ['root', 'myentry', 'foo'])
 
         # ``zodb_path``
+        self.assertEqual(zodb_path(entry), ['myentry'])
+        self.assertEqual(zodb_path(entry.storage), ['myentry'])
         self.assertEqual(zodb_path(bar), ['myentry', 'bar'])
         self.assertEqual(zodb_path(foo), ['myentry', 'foo'])
 

@@ -1,12 +1,9 @@
 from cone.app.model import AppNode
 from cone.zodb.interfaces import IZODBEntry
 from cone.zodb.interfaces import IZODBEntryNode
-from node.behaviors import AsAttrAccess
-from node.behaviors import Attributes
 from node.behaviors import DefaultInit
 from node.behaviors import Lifecycle
 from node.behaviors import NodeChildValidate
-from node.behaviors import Nodespaces
 from node.behaviors import Nodify
 from node.behaviors import Storage
 from node.ext.zodb import IZODBNode
@@ -23,9 +20,11 @@ from zope.interface import implementer
 
 def zodb_entry_for(node):
     while node:
+        if IZODBEntry.providedBy(node):
+            return node
         if IZODBEntryNode.providedBy(node):
             return node.entry
-        if node.parent is None or not IZODBNode.providedBy(node):
+        if not IZODBNode.providedBy(node) or node.parent is None:
             return None
         node = node.parent
 
@@ -51,6 +50,11 @@ class ZODBEntryNode(OOBTNode):
     def properties(self):
         return self.entry.properties
 
+    def __getitem__(self, name):
+        v = super(ZODBEntryNode, self).__getitem__(name)
+        v._v_parent = self.entry
+        return v
+
 
 @implementer(IZODBEntry)
 class ZODBEntryStorage(Storage):
@@ -65,19 +69,26 @@ class ZODBEntryStorage(Storage):
     @property
     def db_root(self):
         # XXX: currently primary DB only, support named DB
+        #      currently requires a current request. make connection lookup
+        #      function searching on request first, but provides fallback.
         conn = get_connection(get_current_request())
         return conn.root()
 
     @default
     @property
     def storage(self):
-        entry = self.db_root.get(self.db_name)
-        if not entry:
-            entry = self.node_factory(name=self.name, parent=self)
-            self.db_root[self.db_name] = entry
+        storage = self.db_root.get(self.db_name)
+        if not storage:
+            storage = self.node_factory(name=self.name, parent=self)
+            self.db_root[self.db_name] = storage
         else:
-            entry._v_parent = self
-        return entry
+            storage._v_parent = self
+        return storage
+
+    @override
+    @property
+    def attrs(self):
+        return self.storage.attrs
 
     @override
     @locktree
@@ -97,10 +108,7 @@ class ZODBEntryStorage(Storage):
 
 @plumbing(
     AppNode,
-    AsAttrAccess,
     NodeChildValidate,
-    Nodespaces,
-    Attributes,
     DefaultInit,
     Nodify,
     Lifecycle,

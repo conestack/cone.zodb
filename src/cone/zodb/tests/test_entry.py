@@ -8,8 +8,10 @@ from cone.zodb import ZODBEntryNode
 from cone.zodb.interfaces import IZODBEntry
 from cone.zodb.interfaces import IZODBEntryNode
 from cone.zodb.testing import ZODBDummyNode
+from node.ext.zodb import OOBTNodeAttributes
 from node.interfaces import IUUIDAware
 from node.tests import NodeTestCase
+from node.utils import LocationIterator
 import transaction
 import uuid
 
@@ -30,6 +32,7 @@ class TestEntry(NodeTestCase):
         self.assertTrue(isinstance(entry.storage, ZODBEntryNode))
         self.assertEqual(entry.storage.name, 'myentry')
 
+        # storage, entry and parents
         self.assertTrue(entry.storage._v_parent is entry)
         self.assertTrue(entry.storage.entry is entry)
 
@@ -40,6 +43,14 @@ class TestEntry(NodeTestCase):
         # ``metadata`` and ``properties`` are returned from entry
         self.assertTrue(isinstance(entry.storage.metadata, Metadata))
         self.assertTrue(isinstance(entry.storage.properties, Properties))
+
+        self.assertTrue(entry.storage.metadata is entry.metadata)
+        self.assertTrue(entry.storage.properties is entry.properties)
+
+        # ``attrs`` are returned from storage
+        self.assertTrue(isinstance(entry.storage.attrs, OOBTNodeAttributes))
+        self.assertTrue(entry.attrs is entry.storage.attrs)
+        self.assertTrue(entry.attrs.parent is entry.storage)
 
         # Create children
         foo = ZODBDummyNode()
@@ -79,7 +90,7 @@ class TestEntry(NodeTestCase):
         """, entry.storage.treerepr())
 
         # ``__parent__``
-        self.assertTrue(foo.parent is entry.storage)
+        self.assertTrue(foo.parent is entry)
         self.assertTrue(foo.parent.parent is root)
 
         # ``__delitem__``
@@ -93,9 +104,14 @@ class TestEntry(NodeTestCase):
         entry()
 
         # ``zodb_entry_for``
-        self.assertTrue(zodb_entry_for(entry['bar']) is entry)
+        self.assertTrue(zodb_entry_for(entry) is entry)
         self.assertTrue(zodb_entry_for(entry.storage) is entry)
+        self.assertTrue(zodb_entry_for(bar) is entry)
         self.assertTrue(zodb_entry_for(root) is None)
+
+        # LocationIterator
+        self.assertEqual([_ for _ in LocationIterator(bar)], [bar, entry, root])
+        self.assertEqual([_ for _ in LocationIterator(entry)], [entry, root])
 
         # DB name
         class CustomZODBEntry(ZODBEntry):

@@ -6,6 +6,18 @@ Changes
 1.0a1 (unreleased)
 ------------------
 
+- Remove ``AsAttrAccess``, ``Nodespaces``, and ``Attributes`` behaviors from
+  ``ZODBEntry``.
+  [rnix]
+
+- Add ``ZODBEntryStorage.attrs``. Returns attributes of related
+  ``ZODBEntryNode``.
+  [rnix]
+
+- Add ``ZODBEntryNode.__getitem__``. Sets ``ZODBEntryNode.entry`` as parent
+  on children to keep traversal and acquisition paths sane.
+  [rnix]
+
 - Access ``principal_roles`` when initializing nodes with ``ZODBPrincipalACL``
   behavior applied to avoid lazy creation. Needed to prevent ``_p_changed``
   being set on first access.
@@ -16,7 +28,7 @@ Changes
   errors.
   [rnix]
 
-- Proper handling of ``ZODBEntry`` in ``zodb_path``.
+- Proper handling of ``ZODBEntry`` and ``ZODBEntryNode`` in ``zodb_path``.
   [rnix]
 
 - Add ``include_entry`` attribute to ``CatalogAware`` behavior. Flag controls

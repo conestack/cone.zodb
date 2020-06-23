@@ -2,7 +2,6 @@ from cone.app.interfaces import IWorkflowState
 from cone.app.model import AppRoot
 from cone.zodb.entry import ZODBEntry
 from cone.zodb.entry import ZODBEntryNode
-from cone.zodb.interfaces import IZODBEntryNode
 from node.interfaces import IUUIDAware
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
@@ -22,10 +21,10 @@ def force_dt(value):
 def zodb_path(node, default=None):
     path = list()
     while True:
-        if isinstance(node, ZODBEntry):
-            node = node.storage
+        if isinstance(node, ZODBEntryNode):
+            node = node.entry
         path.append(node.name)
-        if node.parent is None or isinstance(node, ZODBEntryNode):
+        if node.parent is None or isinstance(node, ZODBEntry):
             path.reverse()
             return path
         node = node.parent
@@ -81,7 +80,7 @@ def combined_title(node):
     titles = list()
     while True:
         titles.append(node.attrs.get('title', node.name))
-        if node.parent is None or IZODBEntryNode.providedBy(node):
+        if node.parent is None or isinstance(node, (ZODBEntry, ZODBEntryNode)):
             break
         node = node.parent
     titles.reverse()

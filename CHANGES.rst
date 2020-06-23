@@ -8,11 +8,7 @@ Changes
 
 - Access ``principal_roles`` when initializing nodes with ``ZODBPrincipalACL``
   behavior applied to avoid lazy creation. Needed to prevent ``_p_changed``
-  being set by ZODB on first access.
-  [rnix]
-
-- Set ``_v_parent`` instead of ``__parent__`` in ``ZODBEntryStorage.storage``
-  to prevent ``_p_changed`` being set by ZODB on access.
+  being set on first access.
   [rnix]
 
 - Do not remember ``principal_roles`` via ``instance_property`` decorator
@@ -28,9 +24,6 @@ Changes
   [rnix]
 
 - Add ``entry`` property to ``ZODBEntryNode``.
-  [rnix]
-
-- Add ``__parent__`` setter function to ``ZODBEntryNode``.
   [rnix]
 
 - Use ``pyramid_zodbconn`` instead of ``repoze.zodbconn``.

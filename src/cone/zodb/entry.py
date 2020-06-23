@@ -39,10 +39,6 @@ class ZODBEntryNode(OOBTNode):
         # interested in it's parent when traversing.
         return self._v_parent.parent
 
-    @__parent__.setter
-    def __parent__(self, value):
-        self._v_parent = value
-
     @property
     def entry(self):
         return self._v_parent

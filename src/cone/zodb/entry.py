@@ -35,6 +35,8 @@ class ZODBEntryNode(OOBTNode):
 
     @property
     def __parent__(self):
+        # note: as parent ZODBEntryStorage instance is set, but we are
+        # interested in it's parent when traversing.
         return self._v_parent.parent
 
     @__parent__.setter
@@ -78,7 +80,7 @@ class ZODBEntryStorage(Storage):
             entry = self.node_factory(name=self.name, parent=self)
             self.db_root[self.db_name] = entry
         else:
-            entry.__parent__ = self
+            entry._v_parent = self
         return entry
 
     @override

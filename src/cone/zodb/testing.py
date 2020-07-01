@@ -84,8 +84,8 @@ class ZODBLayer(Security):
         self.zodb.close()
         shutil.rmtree(self.tempdir)
 
-    def new_request(self):
-        request = super(ZODBLayer, self).new_request()
+    def new_request(self, type=None, xhr=False):
+        request = super(ZODBLayer, self).new_request(type=type, xhr=xhr)
         setattr(request, '_primary_zodb_conn', self.zodb_connection)
         return request
 

@@ -34,7 +34,7 @@ class ZODBEntryNode(OOBTNode):
 
     @property
     def __parent__(self):
-        # note: as parent ZODBEntryStorage instance is set, but we are
+        # ZODBEntryStorage instance is set as parent, but we are
         # interested in it's parent when traversing.
         return self._v_parent.parent
 
@@ -52,7 +52,9 @@ class ZODBEntryNode(OOBTNode):
 
     def __getitem__(self, name):
         v = super(ZODBEntryNode, self).__getitem__(name)
-        v._v_parent = self.entry
+        # _v_parent is not set if ZODBEntryNode is not read via ZODBEntryStorage
+        # but from ZODB root directly.
+        v._v_parent = getattr(self, '_v_parent', None)
         return v
 
 

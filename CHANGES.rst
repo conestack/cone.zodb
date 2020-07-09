@@ -6,6 +6,10 @@ Changes
 1.0a1 (unreleased)
 ------------------
 
+- Fix case where ``_v_parent`` is not set if ``ZODBEntryNode`` is not read via
+  ``ZODBEntryStorage`` but from ZODB root directly.
+  [rnix]
+
 - Remove ``AsAttrAccess``, ``Nodespaces``, and ``Attributes`` behaviors from
   ``ZODBEntry``.
   [rnix]

@@ -12,9 +12,5 @@
 .. image:: https://coveralls.io/repos/github/bluedynamics/cone.zodb/badge.svg?branch=master
     :target: https://coveralls.io/github/bluedynamics/cone.zodb?branch=master
 
-
-cone.zodb
-=========
-
 This package provides ZODB integration in ``cone.app`` and basic
 application nodes for publishing ZODB models.

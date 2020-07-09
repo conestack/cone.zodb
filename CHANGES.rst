@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.0a1 (unreleased)
+1.0a1 (2020-07-09)
 ------------------
 
 - Fix case where ``_v_parent`` is not set if ``ZODBEntryNode`` is not read via

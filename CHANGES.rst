@@ -4,7 +4,8 @@ Changes
 1.0a2 (unreleased)
 ------------------
 
-- No changes yet.
+- Implement ``node.iterfaces.IOrder`` on ``ZODBEntry``.
+  [rnix]
 
 
 1.0a1 (2020-07-09)

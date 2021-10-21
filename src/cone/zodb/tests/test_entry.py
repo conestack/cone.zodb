@@ -9,6 +9,8 @@ from cone.zodb.interfaces import IZODBEntry
 from cone.zodb.interfaces import IZODBEntryNode
 from cone.zodb.testing import ZODBDummyNode
 from node.ext.zodb import OOBTNodeAttributes
+from node.interfaces import IOrder
+from node.interfaces import IOrdered
 from node.interfaces import IUUIDAware
 from node.tests import NodeTestCase
 from node.utils import LocationIterator
@@ -68,6 +70,10 @@ class TestEntry(NodeTestCase):
         # ``keys``
         self.assertEqual(foo.attrs.keys(), ['title', 'uuid'])
 
+        # ``__parent__``
+        self.assertTrue(foo.parent is entry)
+        self.assertTrue(foo.parent.parent is root)
+
         # IZODBEntry and IZODBEntryNode
         self.assertTrue(IZODBEntry.providedBy(entry))
         self.assertTrue(IZODBEntryNode.providedBy(entry.storage))
@@ -89,9 +95,45 @@ class TestEntry(NodeTestCase):
           <class 'cone.zodb.testing.ZODBDummyNode'>: bar
         """, entry.storage.treerepr())
 
-        # ``__parent__``
-        self.assertTrue(foo.parent is entry)
-        self.assertTrue(foo.parent.parent is root)
+        # IOrdered and IOrder
+        self.assertTrue(IOrdered.providedBy(entry))
+        self.assertTrue(IOrder.providedBy(entry))
+
+        # first_key
+        self.assertEqual(entry.first_key, 'foo')
+
+        # last_key
+        self.assertEqual(entry.last_key, 'bar')
+
+        # next_key
+        self.assertEqual(entry.next_key('foo'), 'bar')
+
+        # prev_key
+        self.assertEqual(entry.prev_key('bar'), 'foo')
+
+        # swap
+        entry.swap(entry['foo'], entry['bar'])
+        self.assertEqual(entry.keys(), ['bar', 'foo'])
+
+        # insertbefore
+        foo = entry.detach('foo')
+        entry.insertbefore(foo, entry['bar'])
+        self.assertEqual(entry.keys(), ['foo', 'bar'])
+
+        # insertafter
+        foo = entry.detach('foo')
+        entry.insertafter(foo, entry['bar'])
+        self.assertEqual(entry.keys(), ['bar', 'foo'])
+
+        # insertfirst
+        foo = entry.detach('foo')
+        entry.insertfirst(foo)
+        self.assertEqual(entry.keys(), ['foo', 'bar'])
+
+        # insertlast
+        foo = entry.detach('foo')
+        entry.insertlast(foo)
+        self.assertEqual(entry.keys(), ['bar', 'foo'])
 
         # ``__delitem__``
         del entry['foo']

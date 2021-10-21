@@ -6,6 +6,7 @@ from node.behaviors import Lifecycle
 from node.behaviors import NodeChildValidate
 from node.behaviors import Nodify
 from node.behaviors import Storage
+from node.behaviors import Order
 from node.ext.zodb import IZODBNode
 from node.ext.zodb import OOBTNode
 from node.interfaces import IOrdered
@@ -112,9 +113,22 @@ class ZODBEntryStorage(Storage):
     AppNode,
     NodeChildValidate,
     DefaultInit,
+    Order,
     Nodify,
     Lifecycle,
     ZODBEntryStorage)
 @implementer(IOrdered)
 class ZODBEntry(object):
-    pass
+
+    # override methods of ``Order`` which expect odict like storage on self.
+    # we already have ``IOrder`` providing node as storage, proxy related
+    # calls to storage.
+
+    def swap(self, node_a, node_b):
+        self.storage.swap(node_a, node_b)
+
+    def insertbefore(self, newnode, refnode):
+        self.storage.insertbefore(newnode, refnode)
+
+    def insertafter(self, newnode, refnode):
+        self.storage.insertafter(newnode, refnode)

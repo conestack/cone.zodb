@@ -74,10 +74,10 @@ class ZODBPrincipalACLEntry(ZODBEntry):
 class ZODBLayer(Security):
 
     def setUp(self, args=None):
-        super(ZODBLayer, self).make_app()
         self.tempdir = tempfile.mkdtemp()
         self.zodb_connection = None
         self.init_zodb()
+        super(ZODBLayer, self).setUp(args=args)
 
     def tearDown(self):
         super(ZODBLayer, self).tearDown()

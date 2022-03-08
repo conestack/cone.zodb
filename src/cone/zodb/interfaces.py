@@ -1,9 +1,9 @@
 from node.ext.zodb import IZODBNode
-from node.interfaces import IStorage
+from node.interfaces import IMappingStorage
 from node.interfaces import IUUIDAware
 
 
-class IZODBEntry(IStorage):
+class IZODBEntry(IMappingStorage):
     """Marker interface for ZODB entry. ``storage`` attribute contains a
     ``IZODBEntryNode`` implementing instance.
     """

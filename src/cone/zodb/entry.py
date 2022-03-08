@@ -3,9 +3,9 @@ from cone.zodb.interfaces import IZODBEntry
 from cone.zodb.interfaces import IZODBEntryNode
 from node.behaviors import DefaultInit
 from node.behaviors import Lifecycle
-from node.behaviors import NodeChildValidate
-from node.behaviors import Nodify
-from node.behaviors import Storage
+from node.behaviors import MappingConstraints
+from node.behaviors import MappingNode
+from node.behaviors import MappingStorage
 from node.behaviors import Order
 from node.ext.zodb import IZODBNode
 from node.ext.zodb import OOBTNode
@@ -60,7 +60,7 @@ class ZODBEntryNode(OOBTNode):
 
 
 @implementer(IZODBEntry)
-class ZODBEntryStorage(Storage):
+class ZODBEntryStorage(MappingStorage):
     node_factory = default(ZODBEntryNode)
 
     @default
@@ -111,10 +111,10 @@ class ZODBEntryStorage(Storage):
 
 @plumbing(
     AppNode,
-    NodeChildValidate,
+    MappingConstraints,
     DefaultInit,
     Order,
-    Nodify,
+    MappingNode,
     Lifecycle,
     ZODBEntryStorage)
 @implementer(IOrdered)

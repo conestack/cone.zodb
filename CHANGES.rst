@@ -4,7 +4,17 @@ Changes
 1.0a3 (unreleased)
 ------------------
 
-- No changes yet.
+- Replace deprecated use of ``IStorage`` by ``IMappingStorage``.
+  [rnix]
+
+- Replace deprecated use of ``Storage`` by ``MappingStorage``.
+  [rnix]
+
+- Replace deprecated use of ``Nodify`` by ``MappingNode``.
+  [rnix]
+
+- Replace deprecated use of ``NodeChildValidate`` by ``MappingConstraints``.
+  [rnix]
 
 
 1.0a2 (2021-10-21)

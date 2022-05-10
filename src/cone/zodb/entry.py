@@ -132,3 +132,21 @@ class ZODBEntry(object):
 
     def insertafter(self, newnode, refnode):
         self.storage.insertafter(newnode, refnode)
+
+    def insertfirst(self, newnode):
+        self.storage.insertfirst(newnode)
+
+    def insertlast(self, newnode):
+        self.storage.insertlast(newnode)
+
+    def movebefore(self, movenode, refnode):
+        self.storage.movebefore(movenode, refnode)
+
+    def moveafter(self, movenode, refnode):
+        self.storage.moveafter(movenode, refnode)
+
+    def movefirst(self, movenode):
+        self.storage.movefirst(movenode)
+
+    def movelast(self, movenode):
+        self.storage.movelast(movenode)

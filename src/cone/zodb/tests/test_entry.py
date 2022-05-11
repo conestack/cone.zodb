@@ -135,6 +135,22 @@ class TestEntry(NodeTestCase):
         entry.insertlast(foo)
         self.assertEqual(entry.keys(), ['bar', 'foo'])
 
+        # movebefore
+        entry.movebefore('foo', 'bar')
+        self.assertEqual(entry.keys(), ['foo', 'bar'])
+
+        # moveafter
+        entry.moveafter('foo', 'bar')
+        self.assertEqual(entry.keys(), ['bar', 'foo'])
+
+        # movefirst
+        entry.movefirst('foo')
+        self.assertEqual(entry.keys(), ['foo', 'bar'])
+
+        # movelast
+        entry.movelast('foo')
+        self.assertEqual(entry.keys(), ['bar', 'foo'])
+
         # ``__delitem__``
         del entry['foo']
         self.check_output("""

@@ -17,7 +17,7 @@ class ZODBPrincipalACL(PrincipalACL):
     @default
     @instance_property
     def principal_roles(self):
-        return OOBTNodeAttributes('principal_roles')
+        return OOBTNodeAttributes(name='principal_roles')
 
 
 class ZODBEntryPrincipalACL(PrincipalACL):

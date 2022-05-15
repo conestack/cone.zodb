@@ -34,8 +34,7 @@ jobs:
           pip install wheel
           pip install coverage
           pip install pyramid==1.9.4 repoze.zcml==1.0b1 repoze.workflow==1.0b1
-          pip install https://github.com/conestack/odict/archive/master.zip
-          pip install https://github.com/conestack/node/archive/1.1.zip
+          pip install https://github.com/conestack/node/archive/master.zip
           pip install -e .[test]
 
       - name: Run tests

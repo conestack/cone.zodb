@@ -12,6 +12,7 @@ function install {
         ./$target/bin/pip install wheel coverage
         ./$target/bin/pip install $pinned_packages
         ./$target/bin/pip install https://github.com/conestack/node/archive/master.zip
+        ./$target/bin/pip install https://github.com/conestack/yafowil.webob/archive/master.zip
         ./$target/bin/pip install -e .[test]
     else
         echo "Interpreter $interpreter not found. Skip install."

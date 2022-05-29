@@ -106,7 +106,7 @@ class TestCatalog(NodeTestCase):
         child.attrs['title'] = 'Child of bar'
         child()
 
-        self.check_output("""
+        self.checkOutput("""
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: bar
@@ -136,7 +136,7 @@ class TestCatalog(NodeTestCase):
         # Delete node. Gets unindexed recursive.
         del entry['bar']
 
-        self.check_output("""
+        self.checkOutput("""
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
         """, entry.treerepr())
@@ -163,7 +163,7 @@ class TestCatalog(NodeTestCase):
         source['c1'] = CatalogAwareZODBNode()
         source['c2'] = CatalogAwareZODBNode()
         entry['target'] = CatalogAwareZODBNode()
-        self.check_output("""
+        self.checkOutput("""
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: source
@@ -199,7 +199,7 @@ class TestCatalog(NodeTestCase):
             ]
         )
 
-        self.check_output("""
+        self.checkOutput("""
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: target
@@ -266,14 +266,14 @@ class TestCatalog(NodeTestCase):
             create_default_metadata
         )
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             lambda: proxy.catalog
         )
         expected = 'ICatalog not provided by invalid_catalog_object'
         self.assertEqual(str(err), expected)
 
-        err = self.expect_error(
+        err = self.expectError(
             ValueError,
             lambda: proxy.doc_map
         )

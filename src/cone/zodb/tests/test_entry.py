@@ -83,13 +83,13 @@ class TestEntry(NodeTestCase):
         self.assertTrue(isinstance(foo.uuid, uuid.UUID))
 
         # Entry and entry node result in the same tree
-        self.check_output("""
+        self.checkOutput("""
         <class 'cone.zodb.entry.ZODBEntry'>: myentry
           <class 'cone.zodb.testing.ZODBDummyNode'>: foo
           <class 'cone.zodb.testing.ZODBDummyNode'>: bar
         """, entry.treerepr())
 
-        self.check_output("""
+        self.checkOutput("""
         <class 'cone.zodb.entry.ZODBEntryNode'>: myentry
           <class 'cone.zodb.testing.ZODBDummyNode'>: foo
           <class 'cone.zodb.testing.ZODBDummyNode'>: bar
@@ -153,7 +153,7 @@ class TestEntry(NodeTestCase):
 
         # ``__delitem__``
         del entry['foo']
-        self.check_output("""
+        self.checkOutput("""
         <class 'cone.zodb.entry.ZODBEntry'>: myentry
           <class 'cone.zodb.testing.ZODBDummyNode'>: bar
         """, entry.treerepr())

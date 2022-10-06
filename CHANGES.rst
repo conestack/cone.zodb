@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.0a3 (unreleased)
+1.0a3 (2022-10-06)
 ------------------
 
 - Replace deprecated use of ``IStorage`` by ``IMappingStorage``.

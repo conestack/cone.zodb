@@ -4,7 +4,11 @@ Changes
 1.0a4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Setup Makefile.
+  [lenadax]
+
+- Run tests with pytest.
+  [lenadax]
 
 
 1.0a3 (2022-10-06)

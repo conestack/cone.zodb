@@ -6,3 +6,9 @@
 /py3/
 /htmlcov/
 /dist/
+/constraints-mxdev.txt
+/requirements-mxdev.txt
+/.mxmake/
+/.venv/
+/venv/
+

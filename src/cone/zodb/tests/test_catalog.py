@@ -96,7 +96,6 @@ class TestCatalog(NodeTestCase):
                 ('uid', uid)
             ]
         )
-
         # Calling the ZODB entry delegates to refering ZODB entry node
         entry()
 

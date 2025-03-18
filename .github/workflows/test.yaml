@@ -20,6 +20,9 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
 
     steps:
       - uses: actions/checkout@v2
@@ -33,6 +36,7 @@ jobs:
         run: |
           pip install wheel
           pip install coverage
+          pip install six
           pip install pyramid==1.9.4 repoze.zcml==1.0b1 repoze.workflow==1.0b1
           pip install https://github.com/conestack/node/archive/master.zip
           pip install https://github.com/conestack/yafowil.webob/archive/master.zip
@@ -41,9 +45,9 @@ jobs:
       - name: Run tests
         run: |
           python --version
-          python -m cone.zodb.tests.__init__
+          python -m src/cone/zodb/tests
 
       - name: Run coverage
         run: |
-          coverage run --source=src/cone/zodb -m cone.zodb.tests.__init__
+          coverage run --source=src/cone/zodb -m src/cone/zodb/tests
           coverage report --fail-under=100

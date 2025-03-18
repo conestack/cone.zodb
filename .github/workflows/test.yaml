@@ -45,9 +45,9 @@ jobs:
       - name: Run tests
         run: |
           python --version
-          python -m src/cone/zodb/tests
+          pytest src/cone/zodb/tests
 
       - name: Run coverage
         run: |
-          coverage run --source=src/cone/zodb -m src/cone/zodb/tests
+          coverage run --source=src/cone/zodb -m pytest src/cone/zodb/tests
           coverage report --fail-under=100

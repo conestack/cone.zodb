@@ -74,7 +74,7 @@ class ZODBPrincipalACLEntry(ZODBEntry):
 class ZODBLayer(Security):
 
     def setUp(self, args=None):
-        self.tempdir = tempfile.mkdtemp()
+        self.zodb_tempdir = tempfile.mkdtemp()
         self.zodb_connection = None
         self.init_zodb()
         super(ZODBLayer, self).setUp(args=args)
@@ -82,7 +82,7 @@ class ZODBLayer(Security):
     def tearDown(self):
         super(ZODBLayer, self).tearDown()
         self.zodb.close()
-        shutil.rmtree(self.tempdir)
+        shutil.rmtree(self.zodb_tempdir)
 
     def new_request(self, type=None, xhr=False):
         request = super(ZODBLayer, self).new_request(type=type, xhr=xhr)
@@ -93,9 +93,9 @@ class ZODBLayer(Security):
         if hasattr(self, 'zodb') and self.zodb:
             self.zodb_connection.close()
             self.zodb.close()
-        filestorage_dir = os.path.join(self.tempdir, 'Data.fs')
+        filestorage_dir = os.path.join(self.zodb_tempdir, 'Data.fs')
         filestorage = FileStorage(filestorage_dir)
-        blobstorage_dir = os.path.join(self.tempdir, 'blobstorage')
+        blobstorage_dir = os.path.join(self.zodb_tempdir, 'blobstorage')
         blobstorage = BlobStorage(
             blobstorage_dir,
             filestorage,

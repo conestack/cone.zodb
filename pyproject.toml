@@ -31,5 +31,8 @@ test = [
 [project.urls]
 Homepage = "http://github.com/conestack/cone.zodb"
 
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cone"]
 [tool.zest-releaser]
 create-wheel = true

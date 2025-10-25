@@ -8,7 +8,7 @@ def read_file(name):
         return f.read()
 
 
-version = '1.0a4.dev0'
+version = '1.0.dev0'
 shortdesc = 'ZODB integration for cone.app'
 longdesc = '\n\n'.join([read_file(name) for name in [
     'README.rst',
@@ -39,11 +39,11 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'node.ext.zodb',
-        'repoze.catalog',
+        'node.ext.zodb<2.0.0',
+        'repoze.catalog==0.9.0',
         'pyramid_tm',
         'pyramid_zodbconn',
-        'cone.app[lxml]>=1.0.3',
+        'cone.app[lxml]>=1.0.3,<1.1.0',
     ],
     extras_require=dict(
     test=[

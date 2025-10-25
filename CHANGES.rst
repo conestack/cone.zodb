@@ -1,8 +1,8 @@
 Changes
 =======
 
-1.0 (unreleased)
-------------------
+1.0 (2025-10-25)
+----------------
 
 - Pin upper versions of dependencies.
   [rnix]

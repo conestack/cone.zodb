@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.0a4 (unreleased)
+1.1.0 (unreleased)
 ------------------
 
 - Setup Makefile.

@@ -21,7 +21,7 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
 dependencies = [
-    "node.ext.zodb",
+    "node.ext.zodb>1.99",
     "repoze.catalog",
     "pyramid_tm",
     "pyramid_zodbconn",

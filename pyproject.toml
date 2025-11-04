@@ -22,15 +22,15 @@ classifiers = [
 ]
 dependencies = [
     "node.ext.zodb>1.99",
-    "repoze.catalog",
     "pyramid_tm",
     "pyramid_zodbconn",
+    "repoze.catalog",
+    "six",
 ]
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "zope.pytestlayer",
+    "cone.app[test]",
 ]
 
 [project.urls]

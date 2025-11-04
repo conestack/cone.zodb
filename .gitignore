@@ -2,14 +2,11 @@
 *.pyo
 *.egg-info
 /.coverage
-/py2/
-/py3/
 /htmlcov/
 /dist/
 /constraints-mxdev.txt
 /requirements-mxdev.txt
 /.mxmake/
-/.venv/
 /venv/
-
+/sources/
 /build

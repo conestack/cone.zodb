@@ -4,7 +4,18 @@ Changes
 1.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Modernise the code ruff flags as outdated: ``u''`` prefixes, ``class
+  X(object)``. Behaviour unchanged. ``super(Class, self)`` is kept, see
+  ``cone.app``.
+  [rnix]
+
+- Add ``qa.ruff`` domain to Makefile and pin the ruff rule selection in
+  ``pyproject.toml``, ``make check`` runs ``ruff check``.
+  [rnix]
+
+- Pin ``setuptools<82.0.0`` in ``mx.ini``. ``pyramid`` 2.0.2 still imports
+  ``pkg_resources``, which ``setuptools`` 82 removed.
+  [rnix]
 
 
 1.1.0 (2026-02-03)

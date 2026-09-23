@@ -14,7 +14,7 @@ from zope.interface import implementer
 import uuid
 
 
-class CatalogProxy(object):
+class CatalogProxy:
 
     def __init__(self, dbcontext, indexing_root, catalog_key,
                  doc_map_key, catalog_factory, metadata_factory):
@@ -48,7 +48,7 @@ class CatalogProxy(object):
         entry = self.entry
         catalog = entry.db_root.get(self.catalog_key)
         if catalog and not ICatalog.providedBy(catalog):
-            raise ValueError(u'ICatalog not provided by %s' % self.catalog_key)
+            raise ValueError('ICatalog not provided by %s' % self.catalog_key)
         if not catalog:
             self.reset_catalog()
             catalog = entry.db_root[self.catalog_key]
@@ -60,7 +60,7 @@ class CatalogProxy(object):
         doc_map = entry.db_root.get(self.doc_map_key)
         if doc_map and not isinstance(doc_map, DocumentMap):
             raise ValueError(
-                u'%s not a DocumentMap instance' % self.catalog_key)
+                '%s not a DocumentMap instance' % self.catalog_key)
         if not doc_map:
             entry.db_root[self.doc_map_key] = DocumentMap()
             doc_map = entry.db_root[self.doc_map_key]
@@ -121,7 +121,7 @@ class CatalogProxy(object):
             self.unindex_recursiv(child)
 
 
-class CatalogIndexer(object):
+class CatalogIndexer:
 
     def __init__(self, proxies):
         self.proxies = proxies

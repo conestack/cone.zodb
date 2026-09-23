@@ -89,7 +89,7 @@ class TestIndexing(NodeTestCase):
         # ``get_title`` First ``node.metadata``, then ``node.attrs`` are
         # searched for title. finally default takes effect
         self.assertEqual(get_title(foo, 'default'), 'foo')
-        self.assertEqual(get_title(BaseNode(), 'default'), u'no_title')
+        self.assertEqual(get_title(BaseNode(), 'default'), 'no_title')
 
         class NoTitleNode(BaseNode):
 

@@ -26,6 +26,7 @@ dependencies = [
     "pyramid_tm",
     "pyramid_zodbconn",
     "repoze.catalog",
+    # ``repoze.catalog`` imports ``six`` without declaring it
     "six",
 ]
 
@@ -63,6 +64,12 @@ packages = ["src/cone"]
 consider_namespace_packages = true
 addopts = ["--import-mode=importlib"]
 pythonpath = "src"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "UP"]
+# UP008: zero-argument ``super()`` breaks on ``@plumbing`` decorated classes.
+# UP031: ``%`` formatting is kept.
+ignore = ["UP008", "UP031"]
 
 [tool.zest-releaser]
 create-wheel = true

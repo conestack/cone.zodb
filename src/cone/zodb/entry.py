@@ -118,7 +118,7 @@ class ZODBEntryStorage(MappingStorage):
     Lifecycle,
     ZODBEntryStorage)
 @implementer(IOrdered)
-class ZODBEntry(object):
+class ZODBEntry:
 
     # override methods of ``Order`` which expect odict like storage on self.
     # we already have ``IOrder`` providing node as storage, proxy related

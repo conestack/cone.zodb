@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.1.1 (unreleased)
+1.1.1 (2026-10-24)
 ------------------
 
 - Modernise the code ruff flags as outdated: ``u''`` prefixes, ``class

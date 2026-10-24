@@ -15,9 +15,15 @@ import uuid
 
 
 class CatalogProxy:
-
-    def __init__(self, dbcontext, indexing_root, catalog_key,
-                 doc_map_key, catalog_factory, metadata_factory):
+    def __init__(
+        self,
+        dbcontext,
+        indexing_root,
+        catalog_key,
+        doc_map_key,
+        catalog_factory,
+        metadata_factory,
+    ):
         """
         dbcontext
             IZODBNode instance.
@@ -59,8 +65,7 @@ class CatalogProxy:
         entry = self.entry
         doc_map = entry.db_root.get(self.doc_map_key)
         if doc_map and not isinstance(doc_map, DocumentMap):
-            raise ValueError(
-                '%s not a DocumentMap instance' % self.catalog_key)
+            raise ValueError('%s not a DocumentMap instance' % self.catalog_key)
         if not doc_map:
             entry.db_root[self.doc_map_key] = DocumentMap()
             doc_map = entry.db_root[self.doc_map_key]
@@ -122,7 +127,6 @@ class CatalogProxy:
 
 
 class CatalogIndexer:
-
     def __init__(self, proxies):
         self.proxies = proxies
 
@@ -154,8 +158,13 @@ class CatalogAware(UUIDAware):
     def catalog_proxies(self):
         proxies = dict()
         proxies['default'] = CatalogProxy(
-            self, zodb_entry_for(self), 'cone_catalog', 'cone_doc_map',
-            create_default_catalog, create_default_metadata)
+            self,
+            zodb_entry_for(self),
+            'cone_catalog',
+            'cone_doc_map',
+            create_default_catalog,
+            create_default_metadata,
+        )
         return proxies
 
     @default

@@ -1,7 +1,7 @@
 from cone.zodb import testing
 from cone.zodb.testing import ZODBPrincipalACLEntry
-from cone.zodb.testing import ZODBPrincipalACLNode
 from cone.zodb.testing import ZODBPrincipalACLEntryNode
+from cone.zodb.testing import ZODBPrincipalACLNode
 from node.ext.zodb import OOBTNodeAttributes
 from node.tests import NodeTestCase
 from pyramid.security import ALL_PERMISSIONS
@@ -20,10 +20,23 @@ class TestCommon(NodeTestCase):
 
         self.assertEqual(acl[0][0], 'Allow')
         self.assertEqual(acl[0][1], 'someuser')
-        self.assertEqual(sorted(acl[0][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[0][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[1][0], 'Allow')
         self.assertEqual(acl[1][1], 'system.Authenticated')
@@ -36,30 +49,66 @@ class TestCommon(NodeTestCase):
         self.assertEqual(acl[3][0], 'Allow')
         self.assertEqual(acl[3][1], 'role:editor')
         self.assertEqual(
-            sorted(acl[3][2]),
-            ['add', 'change_order', 'edit', 'list', 'view']
+            sorted(acl[3][2]), ['add', 'change_order', 'edit', 'list', 'view']
         )
 
         self.assertEqual(acl[4][0], 'Allow')
         self.assertEqual(acl[4][1], 'role:admin')
-        self.assertEqual(sorted(acl[4][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[4][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[5][0], 'Allow')
         self.assertEqual(acl[5][1], 'role:manager')
-        self.assertEqual(sorted(acl[5][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[5][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[6][0], 'Allow')
         self.assertEqual(acl[6][1], 'role:owner')
-        self.assertEqual(sorted(acl[6][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[6][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[7][0], 'Allow')
         self.assertEqual(acl[7][1], 'system.Everyone')
@@ -85,10 +134,23 @@ class TestCommon(NodeTestCase):
 
         self.assertEqual(acl[0][0], 'Allow')
         self.assertEqual(acl[0][1], 'someuser')
-        self.assertEqual(sorted(acl[0][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[0][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[1][0], 'Allow')
         self.assertEqual(acl[1][1], 'system.Authenticated')
@@ -101,30 +163,66 @@ class TestCommon(NodeTestCase):
         self.assertEqual(acl[3][0], 'Allow')
         self.assertEqual(acl[3][1], 'role:editor')
         self.assertEqual(
-            sorted(acl[3][2]),
-            ['add', 'change_order', 'edit', 'list', 'view']
+            sorted(acl[3][2]), ['add', 'change_order', 'edit', 'list', 'view']
         )
 
         self.assertEqual(acl[4][0], 'Allow')
         self.assertEqual(acl[4][1], 'role:admin')
-        self.assertEqual(sorted(acl[4][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[4][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[5][0], 'Allow')
         self.assertEqual(acl[5][1], 'role:manager')
-        self.assertEqual(sorted(acl[5][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[5][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[6][0], 'Allow')
         self.assertEqual(acl[6][1], 'role:owner')
-        self.assertEqual(sorted(acl[6][2]), [
-            'add', 'change_order', 'change_state', 'copy', 'cut', 'delete',
-            'edit', 'list', 'manage_permissions', 'paste', 'view'
-        ])
+        self.assertEqual(
+            sorted(acl[6][2]),
+            [
+                'add',
+                'change_order',
+                'change_state',
+                'copy',
+                'cut',
+                'delete',
+                'edit',
+                'list',
+                'manage_permissions',
+                'paste',
+                'view',
+            ],
+        )
 
         self.assertEqual(acl[7][0], 'Allow')
         self.assertEqual(acl[7][1], 'system.Everyone')

@@ -62,10 +62,7 @@ class TestIndexing(NodeTestCase):
         self.assertEqual(force_dt('foo'), datetime(1980, 1, 1, 0, 0))
         self.assertTrue(FLOORDATETIME == force_dt('foo'))
 
-        self.assertEqual(
-            force_dt(datetime(2011, 5, 1)),
-            datetime(2011, 5, 1, 0, 0)
-        )
+        self.assertEqual(force_dt(datetime(2011, 5, 1)), datetime(2011, 5, 1, 0, 0))
 
         # ``get_uid``
         @plumbing(UUIDAware)
@@ -92,7 +89,6 @@ class TestIndexing(NodeTestCase):
         self.assertEqual(get_title(BaseNode(), 'default'), 'no_title')
 
         class NoTitleNode(BaseNode):
-
             @property
             def metadata(self):
                 return Metadata()
@@ -102,17 +98,20 @@ class TestIndexing(NodeTestCase):
         # ``create_default_catalog``
         self.assertEqual(
             sorted(create_default_catalog().keys()),
-            ['app_path', 'path', 'state', 'title', 'type', 'uid']
+            ['app_path', 'path', 'state', 'title', 'type', 'uid'],
         )
 
         # ``create_default_metadata``
         setattr(bar, 'state', 'some_wf_state')
         alsoProvides(bar, IWorkflowState)
-        self.assertEqual(create_default_metadata(bar), {
-            'app_path': ['root', 'myentry', 'bar'],
-            'uid': bar.uuid,
-            'title': 'Bar title',
-            'state': 'some_wf_state',
-            'combined_title': 'myentry - Bar title',
-            'path': ['myentry', 'bar']
-        })
+        self.assertEqual(
+            create_default_metadata(bar),
+            {
+                'app_path': ['root', 'myentry', 'bar'],
+                'uid': bar.uuid,
+                'title': 'Bar title',
+                'state': 'some_wf_state',
+                'combined_title': 'myentry - Bar title',
+                'path': ['myentry', 'bar'],
+            },
+        )

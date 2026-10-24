@@ -32,7 +32,6 @@ def zodb_entry_for(node):
 
 @implementer(IZODBEntryNode)
 class ZODBEntryNode(OOBTNode):
-
     @property
     def __parent__(self):
         # ZODBEntryStorage instance is set as parent, but we are
@@ -116,10 +115,10 @@ class ZODBEntryStorage(MappingStorage):
     Order,
     MappingNode,
     Lifecycle,
-    ZODBEntryStorage)
+    ZODBEntryStorage,
+)
 @implementer(IOrdered)
 class ZODBEntry:
-
     # override methods of ``Order`` which expect odict like storage on self.
     # we already have ``IOrder`` providing node as storage, proxy related
     # calls to storage.

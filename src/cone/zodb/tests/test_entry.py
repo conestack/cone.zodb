@@ -83,17 +83,23 @@ class TestEntry(NodeTestCase):
         self.assertTrue(isinstance(foo.uuid, uuid.UUID))
 
         # Entry and entry node result in the same tree
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'cone.zodb.entry.ZODBEntry'>: myentry
           <class 'cone.zodb.testing.ZODBDummyNode'>: foo
           <class 'cone.zodb.testing.ZODBDummyNode'>: bar
-        """, entry.treerepr())
+        """,
+            entry.treerepr(),
+        )
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'cone.zodb.entry.ZODBEntryNode'>: myentry
           <class 'cone.zodb.testing.ZODBDummyNode'>: foo
           <class 'cone.zodb.testing.ZODBDummyNode'>: bar
-        """, entry.storage.treerepr())
+        """,
+            entry.storage.treerepr(),
+        )
 
         # IOrdered and IOrder
         self.assertTrue(IOrdered.providedBy(entry))
@@ -153,10 +159,13 @@ class TestEntry(NodeTestCase):
 
         # ``__delitem__``
         del entry['foo']
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'cone.zodb.entry.ZODBEntry'>: myentry
           <class 'cone.zodb.testing.ZODBDummyNode'>: bar
-        """, entry.treerepr())
+        """,
+            entry.treerepr(),
+        )
 
         # ``__call__`` delegates to storage, which is the ZODB entry node
         entry()

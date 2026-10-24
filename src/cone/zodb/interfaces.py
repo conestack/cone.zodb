@@ -10,10 +10,8 @@ class IZODBEntry(IMappingStorage):
 
 
 class IZODBEntryNode(IZODBNode):
-    """Marker interface for first level ZODB nodes.
-    """
+    """Marker interface for first level ZODB nodes."""
 
 
 class ICatalogAware(IUUIDAware):
-    """Marker interface if node is ZODB catalog aware.
-    """
+    """Marker interface if node is ZODB catalog aware."""

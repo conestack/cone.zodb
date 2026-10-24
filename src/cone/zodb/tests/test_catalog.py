@@ -30,8 +30,7 @@ class TestCatalog(NodeTestCase):
 
         self.assertTrue(isinstance(catalog, Catalog))
         self.assertEqual(
-            sorted(catalog.keys()),
-            ['app_path', 'path', 'state', 'title', 'type', 'uid']
+            sorted(catalog.keys()), ['app_path', 'path', 'state', 'title', 'type', 'uid']
         )
         self.assertTrue(isinstance(catalog['app_path'], CatalogPathIndex))
         self.assertTrue(isinstance(catalog['path'], CatalogPathIndex))
@@ -80,7 +79,8 @@ class TestCatalog(NodeTestCase):
                 ('combined_title', 'catalog_aware - foo'),
                 ('path', ['catalog_aware', 'foo']),
                 ('title', 'foo'),
-                ('uid', uid)]
+                ('uid', uid),
+            ],
         )
 
         # Reindexing happens at ``__call__`` time
@@ -93,8 +93,8 @@ class TestCatalog(NodeTestCase):
                 ('combined_title', 'catalog_aware - foo changed'),
                 ('path', ['catalog_aware', 'foo']),
                 ('title', 'foo changed'),
-                ('uid', uid)
-            ]
+                ('uid', uid),
+            ],
         )
         # Calling the ZODB entry delegates to refering ZODB entry node
         entry()
@@ -105,12 +105,15 @@ class TestCatalog(NodeTestCase):
         child.attrs['title'] = 'Child of bar'
         child()
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: bar
             <class 'cone.zodb.testing.CatalogAwareZODBNode'>: child
-        """, entry.treerepr())
+        """,
+            entry.treerepr(),
+        )
 
         bar_uid = bar.uuid
         res = entry.catalog_proxies['default'].catalog.query(Eq('uid', bar_uid))
@@ -123,10 +126,7 @@ class TestCatalog(NodeTestCase):
         self.assertEqual(len(res[1]), 1)
 
         # Rebuild catalog
-        self.assertEqual(
-            entry.catalog_proxies['default'].rebuild_catalog(),
-            3
-        )
+        self.assertEqual(entry.catalog_proxies['default'].rebuild_catalog(), 3)
 
         res = entry.catalog_proxies['default'].catalog.query(Eq('type', 'dummytype'))
         self.assertEqual(res[0], 3)
@@ -135,10 +135,13 @@ class TestCatalog(NodeTestCase):
         # Delete node. Gets unindexed recursive.
         del entry['bar']
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
-        """, entry.treerepr())
+        """,
+            entry.treerepr(),
+        )
 
         res = entry.catalog_proxies['default'].catalog.query(Eq('uid', bar_uid))
         self.assertEqual(res[0], 0)
@@ -152,24 +155,24 @@ class TestCatalog(NodeTestCase):
         self.assertEqual(res[0], 1)
         self.assertEqual(len(res[1]), 1)
 
-        self.assertEqual(
-            entry.catalog_proxies['default'].rebuild_catalog(),
-            1
-        )
+        self.assertEqual(entry.catalog_proxies['default'].rebuild_catalog(), 1)
 
         # Test moving of subtrees, if objects get indexed the right way
         source = entry['source'] = CatalogAwareZODBNode()
         source['c1'] = CatalogAwareZODBNode()
         source['c2'] = CatalogAwareZODBNode()
         entry['target'] = CatalogAwareZODBNode()
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: source
             <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c1
             <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c2
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: target
-        """, entry.treerepr())
+        """,
+            entry.treerepr(),
+        )
 
         uid = source['c1'].uuid
         self.assertEqual(
@@ -179,8 +182,8 @@ class TestCatalog(NodeTestCase):
                 ('combined_title', 'catalog_aware - foo - foo'),
                 ('path', ['catalog_aware', 'source', 'c1']),
                 ('title', 'foo'),
-                ('uid', uid)
-            ]
+                ('uid', uid),
+            ],
         )
 
         to_move = entry.detach('source')
@@ -194,18 +197,21 @@ class TestCatalog(NodeTestCase):
                 ('combined_title', 'catalog_aware - foo - foo - foo'),
                 ('path', ['catalog_aware', 'target', 'source', 'c1']),
                 ('title', 'foo'),
-                ('uid', uid)
-            ]
+                ('uid', uid),
+            ],
         )
 
-        self.checkOutput("""
+        self.checkOutput(
+            """
         <class 'cone.zodb.testing.CatalogAwareZODBEntry'>: catalog_aware
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: foo
           <class 'cone.zodb.testing.CatalogAwareZODBNode'>: target
             <class 'cone.zodb.testing.CatalogAwareZODBNode'>: source
               <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c1
               <class 'cone.zodb.testing.CatalogAwareZODBNode'>: c2
-        """, entry.treerepr())
+        """,
+            entry.treerepr(),
+        )
 
         res = entry.catalog_proxies['default'].catalog.query(
             Eq('path', {'query': '/catalog_aware/target'})
@@ -262,20 +268,14 @@ class TestCatalog(NodeTestCase):
             'invalid_catalog_object',
             'invalid_doc_map_object',
             create_default_catalog,
-            create_default_metadata
+            create_default_metadata,
         )
 
-        err = self.expectError(
-            ValueError,
-            lambda: proxy.catalog
-        )
+        err = self.expectError(ValueError, lambda: proxy.catalog)
         expected = 'ICatalog not provided by invalid_catalog_object'
         self.assertEqual(str(err), expected)
 
-        err = self.expectError(
-            ValueError,
-            lambda: proxy.doc_map
-        )
+        err = self.expectError(ValueError, lambda: proxy.doc_map)
         expected = 'invalid_catalog_object not a DocumentMap instance'
         self.assertEqual(str(err), expected)
 
@@ -286,13 +286,16 @@ class TestCatalog(NodeTestCase):
         self.assertEqual(res[0], 1)
         self.assertEqual(len(res[1]), 1)
 
-        self.assertEqual([
-            ('app_path', ['root', 'catalog_included']),
-            ('combined_title', 'catalog_included'),
-            ('path', ['catalog_included']),
-            ('title', 'catalog_included'),
-            ('uid', uid)
-        ], list(entry.catalog_proxies['default'].doc_metadata(str(uid)).items()))
+        self.assertEqual(
+            [
+                ('app_path', ['root', 'catalog_included']),
+                ('combined_title', 'catalog_included'),
+                ('path', ['catalog_included']),
+                ('title', 'catalog_included'),
+                ('uid', uid),
+            ],
+            list(entry.catalog_proxies['default'].doc_metadata(str(uid)).items()),
+        )
 
         # Re-init ZODB connection
         transaction.commit()

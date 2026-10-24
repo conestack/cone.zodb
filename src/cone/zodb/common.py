@@ -6,8 +6,7 @@ from plumber import plumb
 
 
 class ZODBPrincipalACL(PrincipalACL):
-    """Principal ACL for ZODB nodes.
-    """
+    """Principal ACL for ZODB nodes."""
 
     @plumb
     def __init__(next_, self, *a, **kw):
@@ -21,7 +20,6 @@ class ZODBPrincipalACL(PrincipalACL):
 
 
 class ZODBEntryPrincipalACL(PrincipalACL):
-
     @default
     @property
     def principal_roles(self):

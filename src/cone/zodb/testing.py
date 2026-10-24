@@ -60,7 +60,6 @@ class ZODBPrincipalACLNode(ZODBNode):
 
 @plumbing(ZODBPrincipalACL)
 class ZODBPrincipalACLEntryNode(ZODBEntryNode):
-
     @property
     def __acl__(self):
         return DEFAULT_ACL
@@ -72,7 +71,6 @@ class ZODBPrincipalACLEntry(ZODBEntry):
 
 
 class ZODBLayer(Security):
-
     def setUp(self, args=None):
         self.zodb_tempdir = tempfile.mkdtemp()
         self.zodb_connection = None
@@ -96,11 +94,7 @@ class ZODBLayer(Security):
         filestorage_dir = os.path.join(self.zodb_tempdir, 'Data.fs')
         filestorage = FileStorage(filestorage_dir)
         blobstorage_dir = os.path.join(self.zodb_tempdir, 'blobstorage')
-        blobstorage = BlobStorage(
-            blobstorage_dir,
-            filestorage,
-            layout='automatic'
-        )
+        blobstorage = BlobStorage(blobstorage_dir, filestorage, layout='automatic')
         self.zodb = DB(blobstorage)
         self.zodb_connection = self.zodb.open()
 

@@ -4,6 +4,9 @@ Changes
 1.1.2 (unreleased)
 ------------------
 
+- Use ``MappingOrder`` instead of the deprecated ``Order`` behavior.
+  [rnix]
+
 - Sort the imports with ruff (one per line, ``from`` imports first, no
   sections) and format the code with ``ruff format`` (90 characters per line,
   single quotes).

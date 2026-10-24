@@ -5,8 +5,8 @@ from node.behaviors import DefaultInit
 from node.behaviors import Lifecycle
 from node.behaviors import MappingConstraints
 from node.behaviors import MappingNode
+from node.behaviors import MappingOrder
 from node.behaviors import MappingStorage
-from node.behaviors import Order
 from node.ext.zodb import IZODBNode
 from node.ext.zodb import OOBTNode
 from node.interfaces import IOrdered
@@ -112,15 +112,15 @@ class ZODBEntryStorage(MappingStorage):
     AppNode,
     MappingConstraints,
     DefaultInit,
-    Order,
+    MappingOrder,
     MappingNode,
     Lifecycle,
     ZODBEntryStorage,
 )
 @implementer(IOrdered)
 class ZODBEntry:
-    # override methods of ``Order`` which expect odict like storage on self.
-    # we already have ``IOrder`` providing node as storage, proxy related
+    # override methods of ``MappingOrder`` which expect odict like storage on
+    # self. we already have ``IMappingOrder`` providing node as storage, proxy related
     # calls to storage.
 
     def swap(self, node_a, node_b):

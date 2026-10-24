@@ -4,7 +4,7 @@ from cone.zodb.testing import ZODBPrincipalACLEntryNode
 from cone.zodb.testing import ZODBPrincipalACLNode
 from node.ext.zodb import OOBTNodeAttributes
 from node.tests import NodeTestCase
-from pyramid.security import ALL_PERMISSIONS
+from pyramid.authorization import ALL_PERMISSIONS
 
 
 class TestCommon(NodeTestCase):

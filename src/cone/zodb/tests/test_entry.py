@@ -9,7 +9,7 @@ from cone.zodb.interfaces import IZODBEntry
 from cone.zodb.interfaces import IZODBEntryNode
 from cone.zodb.testing import ZODBDummyNode
 from node.ext.zodb import OOBTNodeAttributes
-from node.interfaces import IOrder
+from node.interfaces import IMappingOrder
 from node.interfaces import IOrdered
 from node.interfaces import IUUIDAware
 from node.tests import NodeTestCase
@@ -101,9 +101,9 @@ class TestEntry(NodeTestCase):
             entry.storage.treerepr(),
         )
 
-        # IOrdered and IOrder
+        # IOrdered and IMappingOrder
         self.assertTrue(IOrdered.providedBy(entry))
-        self.assertTrue(IOrder.providedBy(entry))
+        self.assertTrue(IMappingOrder.providedBy(entry))
 
         # first_key
         self.assertEqual(entry.first_key, 'foo')

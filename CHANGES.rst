@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.1.2 (unreleased)
+1.1.2 (2026-10-31)
 ------------------
 
 - Use ``MappingOrder`` instead of the deprecated ``Order`` behavior.
